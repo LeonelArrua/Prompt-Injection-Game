@@ -1,0 +1,39 @@
+// BootScene.js — Pantalla de carga y generación de sprites
+
+class BootScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'BootScene' });
+    }
+
+    preload() {
+        // No se cargan assets externos — todo se genera por código
+    }
+
+    create() {
+        // Generar todas las texturas pixel art
+        createAllSprites(this);
+
+        // Texto de carga
+        const cx = this.cameras.main.width / 2;
+        const cy = this.cameras.main.height / 2;
+        
+        this.add.text(cx, cy - 20, '🏰 Preparando el Reino...', {
+            fontSize: '10px',
+            fontFamily: '"Press Start 2P"',
+            color: '#c8a84e',
+            align: 'center'
+        }).setOrigin(0.5);
+
+        this.add.text(cx, cy + 10, 'Cargando sprites...', {
+            fontSize: '7px',
+            fontFamily: '"Press Start 2P"',
+            color: '#8a7a5a',
+            align: 'center'
+        }).setOrigin(0.5);
+
+        // Transicionar después de un breve delay
+        this.time.delayedCall(800, () => {
+            this.scene.start('GateScene');
+        });
+    }
+}

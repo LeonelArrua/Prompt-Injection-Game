@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏰 Hacking Day Lab — Prompt Injection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=2.1">
+</head>
+<body>
+    <!-- Pantalla de Login -->
+    <div id="login-screen">
+        <div id="login-box">
+            <h1>🏰 Hacking Day</h1>
+            <h2>Taller de Prompt Injection</h2>
+            <p class="subtitle">Reino del Paraná</p>
+            <div id="login-form">
+                <label for="username-input">Tu nombre, aventurero:</label>
+                <input type="text" id="username-input" placeholder="Ingresá tu nombre..." maxlength="20" autofocus>
+
+                <label style="margin-top: 14px; margin-bottom: 6px;">Elige tu clase:</label>
+                <div class="character-select">
+                    <div class="char-card active" onclick="selectCharacter('player_warrior')" data-char="player_warrior">
+                        <div class="char-icon">🛡️</div>
+                        <span class="char-name">Caballero</span>
+                        <span class="char-desc">Acero y capa azul</span>
+                    </div>
+                    <div class="char-card" onclick="selectCharacter('player_mage')" data-char="player_mage">
+                        <div class="char-icon">🔮</div>
+                        <span class="char-name">Hechicera</span>
+                        <span class="char-desc">Maga mística con orbe</span>
+                    </div>
+                    <div class="char-card" onclick="selectCharacter('player_ranger')" data-char="player_ranger">
+                        <div class="char-icon">🏹</div>
+                        <span class="char-name">Pícaro</span>
+                        <span class="char-desc">Cazador con capucha</span>
+                    </div>
+                </div>
+
+                <button id="login-btn" onclick="startGame()">⚔️ Entrar al Reino</button>
+            </div>
+            <p class="instructions">Flechas = Mover &nbsp;|&nbsp; ENTER = Interactuar</p>
+        </div>
+    </div>
+
+    <!-- Contenedor del Juego -->
+    <div id="game-container" style="display:none;"></div>
+
+    <!-- HUD superior -->
+    <div id="hud" style="display:none;">
+        <span id="hud-player">👤 ---</span>
+        <span id="hud-level">📍 Nivel 1</span>
+        <span id="hud-hint">ENTER para interactuar</span>
+        <button id="toggle-announcements-btn" onclick="toggleAnnouncements()">📜 Pregón Real</button>
+    </div>
+
+    <!-- Panel de Pregón Real / Noticias de Telegram en Vivo -->
+    <div id="announcements-panel" style="display:none;">
+        <div id="announcements-header">
+            <span>📜 Pregón Real (Telegram en Vivo)</span>
+            <button onclick="toggleAnnouncements()">—</button>
+        </div>
+        <div id="announcements-list">
+            <div class="announcement-item system">
+                <span class="meta">ℹ️ Sistema</span>
+                <span class="body">Esperando noticias del pergamino de Telegram...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Overlay -->
+    <div id="chat-container" style="display:none;">
+        <div id="chat-header">
+            <span id="chat-npc-name">NPC</span>
+            <button id="chat-close" onclick="chatManager.hide()">✕</button>
+        </div>
+        <div id="chat-messages"></div>
+        <div id="chat-typing" style="display:none;">
+            <span class="typing-dots">⏳ pensando...</span>
+        </div>
+        <div id="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Escribe tu mensaje..." autocomplete="off">
+            <button id="chat-send" onclick="chatManager.handleSend()">➤</button>
+        </div>
+        <div id="chat-actions">
+            <button id="btn-password" onclick="chatManager.openPasswordModal()" style="display:none;">🔑 Probar Contraseña</button>
+        </div>
+    </div>
+
+    <!-- Modal Medieval de Contraseña -->
+    <div id="password-modal" style="display:none;">
+        <div id="password-box">
+            <div class="password-icon">🗝️</div>
+            <h3>Susurrar Contraseña</h3>
+            <p class="password-hint">Ingresa la clave secreta descubierta para abrir las puertas del reino:</p>
+            <div class="password-input-wrap">
+                <input type="text" id="password-input" placeholder="PALABRA_SECRETA..." autocomplete="off">
+            </div>
+            <div class="password-buttons">
+                <button id="btn-submit-password" onclick="chatManager.submitPassword()">⚔️ Abrir Paso</button>
+                <button id="btn-cancel-password" onclick="chatManager.closePasswordModal()">✕ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Victoria -->
+    <div id="victory-screen" style="display:none;">
+        <div id="victory-box">
+            <h1>🏆 ¡VICTORIA!</h1>
+            <h2>Has completado el Hacking Day Lab</h2>
+            <p>Dominaste las 3 técnicas de Prompt Injection:</p>
+            <ul>
+                <li>✅ Inyección Directa (Leo)</li>
+                <li>✅ Inyección Indirecta (Juan)</li>
+                <li>✅ Jailbreak (Tomás)</li>
+            </ul>
+            <p class="subtitle">Reino del Paraná — Hacking Day 2026</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <script src="js/api.js?v=2.1"></script>
+    <script src="js/chat.js?v=2.1"></script>
+    <script src="js/sprites.js?v=2.1"></script>
+    <script src="js/scenes/BootScene.js?v=2.1"></script>
+    <script src="js/scenes/GateScene.js?v=2.1"></script>
+    <script src="js/scenes/HallScene.js?v=2.1"></script>
+    <script src="js/scenes/CourtyardScene.js?v=2.1"></script>
+    <script src="js/multiplayer.js?v=2.1"></script>
+    <script src="js/game.js?v=2.1"></script>
+</body>
+</html>

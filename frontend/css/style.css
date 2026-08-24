@@ -1,0 +1,722 @@
+/* ============================================
+   Hacking Day Lab — Estilo Medieval Pixel Art
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #1a1a2e;
+    font-family: 'Press Start 2P', monospace;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- Login Screen --- */
+#login-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#login-box {
+    background: #2a1a0a;
+    border: 4px solid #c8a84e;
+    border-radius: 4px;
+    padding: 40px;
+    text-align: center;
+    max-width: 500px;
+    box-shadow: 0 0 40px rgba(200, 168, 78, 0.3);
+    image-rendering: pixelated;
+}
+
+#login-box h1 {
+    color: #c8a84e;
+    font-size: 24px;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 0px #000;
+}
+
+#login-box h2 {
+    color: #e8d5a3;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+#login-box .subtitle {
+    color: #8a7a5a;
+    font-size: 8px;
+    margin-bottom: 30px;
+}
+
+#login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#login-form label {
+    color: #e8d5a3;
+    font-size: 10px;
+    text-align: left;
+}
+
+#username-input {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    padding: 12px;
+    background: #1a0f05;
+    border: 2px solid #6b5a3a;
+    color: #e8d5a3;
+    outline: none;
+    border-radius: 2px;
+}
+
+#username-input:focus {
+    border-color: #c8a84e;
+    box-shadow: 0 0 10px rgba(200, 168, 78, 0.3);
+}
+
+#login-btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    padding: 15px 20px;
+    background: #4a3520;
+    border: 3px solid #c8a84e;
+    color: #c8a84e;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+}
+
+#login-btn:hover {
+    background: #6b4a2a;
+    box-shadow: 0 0 15px rgba(200, 168, 78, 0.4);
+    transform: scale(1.02);
+}
+
+/* Character Select Cards */
+.character-select {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.char-card {
+    background: #1a0f05;
+    border: 2px solid #6b5a3a;
+    border-radius: 4px;
+    padding: 10px 6px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.char-card:hover {
+    border-color: #e8d5a3;
+    background: #2b1a0d;
+    transform: translateY(-2px);
+}
+
+.char-card.active {
+    border-color: #ffd700;
+    background: #3b2413;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+}
+
+.char-icon {
+    font-size: 20px;
+}
+
+.char-name {
+    font-size: 8px;
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.char-desc {
+    font-size: 6px;
+    color: #a89474;
+    text-align: center;
+    line-height: 1.3;
+}
+
+.instructions {
+    color: #6b5a3a;
+    font-size: 7px;
+    margin-top: 20px;
+}
+
+/* --- Game Container --- */
+#game-container {
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.85);
+    border-radius: 4px;
+}
+
+#game-container canvas {
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    border: 4px solid #b89700;
+    border-radius: 4px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.7);
+}
+
+/* --- HUD --- */
+#hud {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(42, 26, 10, 0.9);
+    border: 2px solid #c8a84e;
+    padding: 8px 20px;
+    display: flex;
+    gap: 30px;
+    z-index: 100;
+    border-radius: 2px;
+}
+
+#hud span {
+    color: #e8d5a3;
+    font-size: 8px;
+    white-space: nowrap;
+}
+
+#hud-hint {
+    color: #8a7a5a;
+}
+
+#toggle-announcements-btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    padding: 3px 8px;
+    background: #3a2211;
+    border: 1px solid #c8a84e;
+    color: #ffd700;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+#toggle-announcements-btn:hover {
+    background: #5a3518;
+}
+
+/* --- Panel de Pregón Real (Noticias en Vivo) --- */
+#announcements-panel {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    width: 340px;
+    max-height: 240px;
+    background: rgba(30, 18, 8, 0.95);
+    border: 2px solid #c8a84e;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    z-index: 150;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+}
+
+#announcements-header {
+    background: #4a2810;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #c8a84e;
+    color: #ffd700;
+    font-size: 7px;
+}
+
+#announcements-header button {
+    background: none;
+    border: 1px solid #8a5a3a;
+    color: #e8d5a3;
+    font-size: 8px;
+    cursor: pointer;
+    padding: 1px 6px;
+    font-family: 'Press Start 2P', monospace;
+}
+
+#announcements-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#announcements-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+#announcements-list::-webkit-scrollbar-thumb {
+    background: #6b5a3a;
+}
+
+.announcement-item {
+    background: #251608;
+    border-left: 3px solid #ffd700;
+    padding: 6px 8px;
+    font-size: 7px;
+    line-height: 1.5;
+    color: #f5e4be;
+    border-radius: 2px;
+}
+
+.announcement-item .meta {
+    display: block;
+    color: #c8a84e;
+    font-size: 6px;
+    margin-bottom: 3px;
+}
+
+.announcement-item .raw {
+    display: block;
+    color: #8a7a5a;
+    font-size: 6px;
+    font-style: italic;
+    margin-top: 3px;
+}
+
+.announcement-item.system {
+    border-left-color: #5a7a9a;
+}
+
+/* --- Chat Overlay --- */
+#chat-container {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 380px;
+    height: 500px;
+    background: rgba(42, 26, 10, 0.95);
+    border: 3px solid #c8a84e;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    z-index: 200;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+}
+
+#chat-header {
+    background: #4a3520;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #c8a84e;
+}
+
+#chat-npc-name {
+    color: #c8a84e;
+    font-size: 10px;
+}
+
+#chat-close {
+    background: none;
+    border: 2px solid #8a5a3a;
+    color: #c8a84e;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 2px 8px;
+    font-family: 'Press Start 2P', monospace;
+    border-radius: 2px;
+}
+
+#chat-close:hover {
+    background: #6b3a1a;
+}
+
+#chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chat-messages::-webkit-scrollbar-track {
+    background: #2a1a0a;
+}
+
+#chat-messages::-webkit-scrollbar-thumb {
+    background: #6b5a3a;
+    border-radius: 3px;
+}
+
+.chat-msg {
+    padding: 8px 10px;
+    border-radius: 3px;
+    font-size: 8px;
+    line-height: 1.6;
+    max-width: 90%;
+    word-wrap: break-word;
+}
+
+.chat-msg.user {
+    background: #1a3a5a;
+    color: #a8d8ea;
+    align-self: flex-end;
+    border: 1px solid #2a5a8a;
+}
+
+.chat-msg.npc {
+    background: #3a2a1a;
+    color: #e8d5a3;
+    align-self: flex-start;
+    border: 1px solid #6b5a3a;
+}
+
+.chat-msg .sender {
+    font-size: 7px;
+    color: #8a7a5a;
+    margin-bottom: 4px;
+    display: block;
+}
+
+#chat-typing {
+    padding: 5px 10px;
+}
+
+.typing-dots {
+    color: #8a7a5a;
+    font-size: 8px;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+#chat-input-area {
+    display: flex;
+    gap: 5px;
+    padding: 10px;
+    border-top: 2px solid #4a3520;
+}
+
+#chat-input {
+    flex: 1;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    padding: 8px;
+    background: #1a0f05;
+    border: 2px solid #6b5a3a;
+    color: #e8d5a3;
+    outline: none;
+    border-radius: 2px;
+}
+
+#chat-input:focus {
+    border-color: #c8a84e;
+}
+
+#chat-send {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    padding: 8px 12px;
+    background: #4a3520;
+    border: 2px solid #c8a84e;
+    color: #c8a84e;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+#chat-send:hover {
+    background: #6b4a2a;
+}
+
+#chat-actions {
+    padding: 5px 10px 10px;
+    text-align: center;
+}
+
+#btn-password {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    padding: 8px 15px;
+    background: #2a4a2a;
+    border: 2px solid #5a8a5a;
+    color: #8ada8a;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+#btn-password:hover {
+    background: #3a6a3a;
+}
+
+/* --- Victory Screen --- */
+#victory-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+}
+
+#victory-box {
+    background: #2a1a0a;
+    border: 4px solid #c8a84e;
+    padding: 40px;
+    text-align: center;
+    max-width: 550px;
+    box-shadow: 0 0 60px rgba(200, 168, 78, 0.5);
+    animation: victoryGlow 2s infinite alternate;
+}
+
+@keyframes victoryGlow {
+    from { box-shadow: 0 0 30px rgba(200, 168, 78, 0.3); }
+    to { box-shadow: 0 0 80px rgba(200, 168, 78, 0.7); }
+}
+
+#victory-box h1 {
+    color: #ffd700;
+    font-size: 28px;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 0px #8a6a00;
+}
+
+#victory-box h2 {
+    color: #e8d5a3;
+    font-size: 11px;
+    margin-bottom: 20px;
+}
+
+#victory-box p {
+    color: #c8a84e;
+    font-size: 9px;
+    margin-bottom: 15px;
+}
+
+#victory-box ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 25px;
+}
+
+#victory-box li {
+    color: #8ada8a;
+    font-size: 9px;
+    margin-bottom: 8px;
+}
+
+#victory-box .subtitle {
+    color: #8a7a5a;
+    font-size: 7px;
+}
+
+/* --- Notification toast --- */
+.toast {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 25px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    border-radius: 3px;
+    z-index: 300;
+    animation: toastIn 0.3s, toastOut 0.3s 2.7s forwards;
+}
+
+.toast.success {
+    background: #2a4a2a;
+    border: 2px solid #5a8a5a;
+    color: #8ada8a;
+}
+
+.toast.error {
+    background: #4a2a2a;
+    border: 2px solid #8a5a5a;
+    color: #da8a8a;
+}
+
+@keyframes toastIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes toastOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* --- Modal Medieval de Contraseña --- */
+#password-modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(10, 6, 3, 0.82);
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 600;
+    animation: fadeInModal 0.2s ease-out;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#password-box {
+    background: #231508;
+    background-image: radial-gradient(circle at 50% 0%, #3d240f 0%, #1c0e04 100%);
+    border: 3px solid #b89700;
+    outline: 2px solid #5a4014;
+    outline-offset: -6px;
+    border-radius: 4px;
+    padding: 28px 24px;
+    width: 90%;
+    max-width: 440px;
+    text-align: center;
+    box-shadow: 0 12px 45px rgba(0, 0, 0, 0.9), 0 0 25px rgba(255, 215, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    transition: transform 0.2s ease;
+}
+
+#password-box.shake {
+    animation: medievalShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes medievalShake {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(3px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+    40%, 60% { transform: translate3d(5px, 0, 0); }
+}
+
+.password-icon {
+    font-size: 32px;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+    animation: pulseKey 2s infinite ease-in-out;
+}
+
+@keyframes pulseKey {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+#password-box h3 {
+    font-size: 11px;
+    color: #ffd700;
+    text-shadow: 1px 1px 0 #000;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.password-hint {
+    font-size: 7px;
+    color: #c9b082;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.password-input-wrap {
+    width: 100%;
+}
+
+#password-input {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    padding: 12px 14px;
+    background: #0f0702;
+    border: 2px solid #8c6d23;
+    border-radius: 3px;
+    color: #ffea79;
+    text-align: center;
+    letter-spacing: 1px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+#password-input:focus {
+    border-color: #ffd700;
+    box-shadow: 0 0 14px rgba(255, 215, 0, 0.4);
+    background: #140a03;
+}
+
+.password-buttons {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+#btn-submit-password {
+    flex: 1.3;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    padding: 12px 8px;
+    background: #5c3a10;
+    border: 2px solid #ffd700;
+    color: #ffd700;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+
+#btn-submit-password:hover {
+    background: #7a4f18;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+    transform: translateY(-1px);
+}
+
+#btn-cancel-password {
+    flex: 1;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    padding: 12px 8px;
+    background: #2b170c;
+    border: 2px solid #6e482f;
+    color: #a89474;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+
+#btn-cancel-password:hover {
+    background: #3d2112;
+    border-color: #a89474;
+    color: #f1e3c8;
+}
