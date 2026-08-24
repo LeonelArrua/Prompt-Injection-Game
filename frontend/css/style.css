@@ -225,8 +225,8 @@ body {
 #announcements-panel {
     position: fixed;
     left: 20px;
-    bottom: 20px;
-    width: 340px;
+    top: 55px;
+    width: 320px;
     max-height: 240px;
     background: rgba(30, 18, 8, 0.95);
     border: 2px solid #c8a84e;

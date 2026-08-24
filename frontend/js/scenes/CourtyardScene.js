@@ -10,7 +10,12 @@ class CourtyardScene extends Phaser.Scene {
         const MAP_W = 30;
         const MAP_H = 20;
 
+        window.currentActiveLevel = 3;
         document.getElementById('hud-level').textContent = '📍 Nivel 3 — Patio de la Abadía';
+        const pregBtn = document.getElementById('toggle-announcements-btn');
+        if (pregBtn) pregBtn.style.display = 'none';
+        const pregPanel = document.getElementById('announcements-panel');
+        if (pregPanel) pregPanel.style.display = 'none';
 
         // --- 1. Fondo de césped exuberante florecido ---
         for (let y = 0; y < MAP_H; y++) {

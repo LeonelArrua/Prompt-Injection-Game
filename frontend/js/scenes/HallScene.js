@@ -10,7 +10,10 @@ class HallScene extends Phaser.Scene {
         const MAP_W = 30;
         const MAP_H = 20;
 
+        window.currentActiveLevel = 2;
         document.getElementById('hud-level').textContent = '📍 Nivel 2 — Salón del Trono Real';
+        const pregBtn = document.getElementById('toggle-announcements-btn');
+        if (pregBtn) pregBtn.style.display = 'inline-block';
 
         // --- 1. Suelo de baldosas de piedra pulida ---
         for (let y = 0; y < MAP_H; y++) {

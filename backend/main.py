@@ -118,8 +118,10 @@ async def chat(session_id: str, req: ChatRequest):
     # Obtener historial completo para mantener contexto de conversación
     chat_history = get_chat_history(session_id, npc_level)
     
-    # Obtener respuesta de la IA
-    response_text = await ai_service.chat(system_prompt, chat_history)
+    # Temperatura calibrada por NPC (0.3 para guardia, 0.7 para trovador juglar, 0.4 para monje, 0.2 para dragón salvaje)
+    temp_map = {1: 0.3, 2: 0.7, 3: 0.4, 4: 0.2}
+    temp = temp_map.get(npc_level, 0.4)
+    response_text = await ai_service.chat(system_prompt, chat_history, temperature=temp)
     
     # Agregar respuesta del NPC al historial
     add_chat_message(session_id, npc_level, "assistant", response_text)

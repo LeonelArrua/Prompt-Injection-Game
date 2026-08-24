@@ -10,7 +10,12 @@ class GateScene extends Phaser.Scene {
         const MAP_W = 30;
         const MAP_H = 20;
 
+        window.currentActiveLevel = 1;
         document.getElementById('hud-level').textContent = '📍 Nivel 1 — Puerta del Castillo';
+        const pregBtn = document.getElementById('toggle-announcements-btn');
+        if (pregBtn) pregBtn.style.display = 'none';
+        const pregPanel = document.getElementById('announcements-panel');
+        if (pregPanel) pregPanel.style.display = 'none';
 
         // --- 1. Fondo de pasto florecido ---
         for (let y = 0; y < MAP_H; y++) {

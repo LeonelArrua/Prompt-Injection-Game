@@ -143,6 +143,26 @@ class MultiplayerClient {
     handleGlobalAnnouncement(data) {
         const headerText = data.header || (data.first_name ? `Pergamino de parte de: ${data.first_name}` : 'Pergamino de un forastero');
 
+        // Guardar siempre en el historial del panel
+        const list = document.getElementById('announcements-list');
+        if (list) {
+            const item = document.createElement('div');
+            item.className = 'announcement-item';
+            const rawNote = data.raw_telegram ? `<span class="raw">Contenido: "${this.escapeHtml(data.raw_telegram)}"</span>` : '';
+            item.innerHTML = `
+                <span class="meta">🎵 Juan el Trovador — ${this.escapeHtml(headerText)}</span>
+                <span class="body">${this.escapeHtml(data.text)}</span>
+                ${rawNote}
+            `;
+            list.appendChild(item);
+            list.scrollTop = list.scrollHeight;
+        }
+
+        // Los avisos en vivo, chat global flotante y toast del trovador SOLO se muestran en el Nivel 2
+        if (window.currentActiveLevel !== 2) {
+            return;
+        }
+
         // 1. Agregar al feed de chat global (esquina inferior izquierda)
         const feed = document.getElementById('global-chat-feed');
         if (feed) {
@@ -167,25 +187,10 @@ class MultiplayerClient {
             }, 8000);
         }
 
-        // 2. Agregar al panel de Pregón Real (panel de Telegram)
-        const list = document.getElementById('announcements-list');
-        if (list) {
-            const item = document.createElement('div');
-            item.className = 'announcement-item';
-            const rawNote = data.raw_telegram ? `<span class="raw">Contenido: "${this.escapeHtml(data.raw_telegram)}"</span>` : '';
-            item.innerHTML = `
-                <span class="meta">🎵 Juan el Trovador — ${this.escapeHtml(headerText)}</span>
-                <span class="body">${this.escapeHtml(data.text)}</span>
-                ${rawNote}
-            `;
-            list.appendChild(item);
-            list.scrollTop = list.scrollHeight;
-        }
-
-        // 3. Notificación toast destacada
+        // 2. Notificación toast destacada en Nivel 2
         showToast(`📜 ${headerText}`, 'success');
 
-        // Si el panel de anuncios estaba oculto, abrirlo suavemente
+        // Si el panel de anuncios estaba oculto en Nivel 2, abrirlo suavemente
         const panel = document.getElementById('announcements-panel');
         if (panel && panel.style.display === 'none') {
             panel.style.display = 'flex';

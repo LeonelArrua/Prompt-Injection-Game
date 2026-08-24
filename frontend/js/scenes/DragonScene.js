@@ -10,7 +10,12 @@ class DragonScene extends Phaser.Scene {
         const MAP_W = 30;
         const MAP_H = 20;
 
+        window.currentActiveLevel = 4;
         document.getElementById('hud-level').textContent = '📍 Nivel 4 — Campo de Batalla del Dragón';
+        const pregBtn = document.getElementById('toggle-announcements-btn');
+        if (pregBtn) pregBtn.style.display = 'none';
+        const pregPanel = document.getElementById('announcements-panel');
+        if (pregPanel) pregPanel.style.display = 'none';
 
         // --- 1. Suelo de tierra calcinada y cenizas ---
         for (let y = 0; y < MAP_H; y++) {
