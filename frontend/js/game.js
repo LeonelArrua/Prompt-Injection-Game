@@ -57,7 +57,7 @@ async function startGame() {
 
     try {
         // Crear sesión en el backend
-        const session = await API.createSession(username);
+        const session = await API.createSession(username, window.selectedCharacter || 'player_warrior');
         window.sessionId = session.session_id;
         window.username = session.username;
 

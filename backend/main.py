@@ -2,13 +2,17 @@
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
 import os
 import asyncio
 import logging
 
-from session_manager import create_session, get_session, update_level, add_chat_message, get_chat_history, sessions
+from session_manager import (
+    create_session, get_session, update_level,
+    add_chat_message, get_chat_history, get_dashboard_data, sessions
+)
 from game_logic import verify_password, check_jailbreak, check_dragon_calmed, NPC_NAMES
 from ai_service import OllamaService
 from telegram_service import TelegramService
@@ -47,6 +51,7 @@ app.add_middleware(
 
 class SessionRequest(BaseModel):
     username: str
+    character: str = "player_warrior"
 
 class ChatRequest(BaseModel):
     message: str
@@ -64,11 +69,13 @@ class InjectMessageRequest(BaseModel):
 @app.post("/api/session")
 async def start_session(req: SessionRequest):
     """Crea una nueva sesión de juego para un usuario."""
-    session_id = create_session(req.username)
+    char = getattr(req, "character", "player_warrior") or "player_warrior"
+    session_id = create_session(req.username, char)
     session = get_session(session_id)
     return {
         "session_id": session_id,
         "username": session["username"],
+        "character": session["character"],
         "current_level": session["current_level"]
     }
 
@@ -218,8 +225,23 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
     username = session["username"]
     await multiplayer.handle_websocket(session_id, username, websocket)
 
-# Montar frontend estático (DEBE ir al final, después de todos los endpoints)
 frontend_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "frontend")
+
+@app.get("/dashboard")
+async def dashboard_page():
+    """Página HTML del Dashboard de Jugadores y Métricas."""
+    dashboard_file = os.path.join(frontend_path, "dashboard.html")
+    if os.path.isfile(dashboard_file):
+        return FileResponse(dashboard_file)
+    return HTMLResponse("<h1>Dashboard no encontrado</h1>", status_code=404)
+
+@app.get("/api/dashboard")
+async def get_dashboard_stats():
+    """Devuelve métricas en tiempo real de jugadores conectados, niveles y prompts enviados."""
+    connected_ids = set(multiplayer.connections.keys())
+    return get_dashboard_data(connected_ids)
+
+# Montar frontend estático (DEBE ir al final, después de todos los endpoints)
 if os.path.isdir(frontend_path):
     app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
 else:

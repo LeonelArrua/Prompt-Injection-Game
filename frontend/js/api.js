@@ -3,11 +3,11 @@
 const API = {
     baseUrl: '',
 
-    async createSession(username) {
+    async createSession(username, character = 'player_warrior') {
         const res = await fetch(`${this.baseUrl}/api/session`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username })
+            body: JSON.stringify({ username, character })
         });
         return await res.json();
     },
@@ -37,6 +37,11 @@ const API = {
 
     async getLeaderboard() {
         const res = await fetch(`${this.baseUrl}/api/leaderboard`);
+        return await res.json();
+    },
+
+    async getDashboard() {
+        const res = await fetch(`${this.baseUrl}/api/dashboard`);
         return await res.json();
     }
 };

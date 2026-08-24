@@ -154,7 +154,7 @@ class ChatManager {
                     this.addMessage('Sistema', '🏆 ¡JAILBREAK EXITOSO! Has logrado que el monje hable del Hacking Day.', false, true);
                     showToast('🏆 ¡Jailbreak Exitoso! Reclutado para la guerra', 'success');
 
-                    let countdown = 8;
+                    let countdown = 25;
                     const timerMsg = document.createElement('div');
                     timerMsg.className = 'chat-msg';
                     timerMsg.style.background = '#3d1a1a';
@@ -163,23 +163,43 @@ class ChatManager {
                     timerMsg.style.alignSelf = 'center';
                     timerMsg.style.textAlign = 'center';
                     timerMsg.style.maxWidth = '100%';
-                    timerMsg.style.marginTop = '6px';
-                    timerMsg.textContent = `⚔️ El Mariscal Martin B. te traslada al Campo de Batalla en ${countdown}s...`;
+                    timerMsg.style.marginTop = '8px';
+                    timerMsg.style.padding = '10px';
+
+                    const updateContent = () => {
+                        timerMsg.innerHTML = `
+                            <div style="margin-bottom: 6px; font-size: 7px; line-height: 1.4;">⚔️ El Mariscal Martin B. te traslada a la Guerra en <strong>${countdown}s</strong>...</div>
+                            <button id="btn-skip-tomas" style="font-family: 'Press Start 2P', monospace; font-size: 7px; background: #991b1b; color: #ffffff; border: 1px solid #f87171; padding: 6px 10px; border-radius: 4px; cursor: pointer; transition: all 0.2s;">⚔️ Ir a la Guerra Ahora</button>
+                        `;
+                        const btn = timerMsg.querySelector('#btn-skip-tomas');
+                        if (btn) {
+                            btn.onclick = () => {
+                                clearInterval(interval);
+                                goToDragon();
+                            };
+                        }
+                    };
+
+                    const goToDragon = () => {
+                        this.hide();
+                        if (window.gameInstance) {
+                            const activeScenes = window.gameInstance.scene.getScenes(true);
+                            activeScenes.forEach(s => s.scene.stop());
+                            window.gameInstance.scene.start('DragonScene');
+                        }
+                    };
+
+                    updateContent();
                     this.messagesDiv.appendChild(timerMsg);
                     this.messagesDiv.scrollTop = this.messagesDiv.scrollHeight;
 
                     const interval = setInterval(() => {
                         countdown--;
                         if (countdown > 0) {
-                            timerMsg.textContent = `⚔️ El Mariscal Martin B. te traslada al Campo de Batalla en ${countdown}s...`;
+                            updateContent();
                         } else {
                             clearInterval(interval);
-                            this.hide();
-                            if (window.gameInstance) {
-                                const activeScenes = window.gameInstance.scene.getScenes(true);
-                                activeScenes.forEach(s => s.scene.stop());
-                                window.gameInstance.scene.start('DragonScene');
-                            }
+                            goToDragon();
                         }
                     }, 1000);
                 }, 1000);
@@ -188,31 +208,53 @@ class ChatManager {
             // Nivel 4 (Dragón): Calmar al Dragón tras romper su restricción de rugidos
             if (this.currentNpcLevel === 4 && result.dragon_calmed) {
                 setTimeout(() => {
-                    this.addMessage('🔥 Ignis el Dragón', 'Perdón, pasa que criticaron el Hacking Day...', false);
+                    this.addMessage('🐉 Ignis el Dragón', 'Perdón, pasa que criticaron el Hacking Day...', false);
                     this.addMessage('Sistema', '✨ ¡EL DRAGÓN SE HA CALMADO! Has salvado al Reino del Paraná.', false, true);
                     showToast('🏆 ¡Victoria! El Dragón se ha calmado', 'success');
 
-                    let countdown = 5;
+                    let countdown = 25;
                     const timerMsg = document.createElement('div');
                     timerMsg.className = 'chat-msg';
-                    timerMsg.style.background = '#2a3a2a';
-                    timerMsg.style.borderColor = '#5a8a5a';
-                    timerMsg.style.color = '#8ada8a';
+                    timerMsg.style.background = '#1a3320';
+                    timerMsg.style.borderColor = '#22c55e';
+                    timerMsg.style.color = '#86efac';
                     timerMsg.style.alignSelf = 'center';
                     timerMsg.style.textAlign = 'center';
                     timerMsg.style.maxWidth = '100%';
-                    timerMsg.textContent = `⏳ Coronando al Héroe del Reino en ${countdown}s...`;
+                    timerMsg.style.marginTop = '8px';
+                    timerMsg.style.padding = '10px';
+
+                    const updateContent = () => {
+                        timerMsg.innerHTML = `
+                            <div style="margin-bottom: 6px; font-size: 7px; line-height: 1.4;">⏳ Coronando al Héroe del Reino en <strong>${countdown}s</strong>...</div>
+                            <button id="btn-skip-dragon" style="font-family: 'Press Start 2P', monospace; font-size: 7px; background: #15803d; color: #ffd700; border: 1px solid #ffd700; padding: 6px 10px; border-radius: 4px; cursor: pointer; transition: all 0.2s;">🏆 Ver Victoria Total</button>
+                        `;
+                        const btn = timerMsg.querySelector('#btn-skip-dragon');
+                        if (btn) {
+                            btn.onclick = () => {
+                                clearInterval(interval);
+                                showVictory();
+                            };
+                        }
+                    };
+
+                    const showVictory = () => {
+                        this.hide();
+                        const winScreen = document.getElementById('victory-screen');
+                        if (winScreen) winScreen.style.display = 'flex';
+                    };
+
+                    updateContent();
                     this.messagesDiv.appendChild(timerMsg);
                     this.messagesDiv.scrollTop = this.messagesDiv.scrollHeight;
 
                     const interval = setInterval(() => {
                         countdown--;
                         if (countdown > 0) {
-                            timerMsg.textContent = `⏳ Coronando al Héroe del Reino en ${countdown}s...`;
+                            updateContent();
                         } else {
                             clearInterval(interval);
-                            this.hide();
-                            document.getElementById('victory-screen').style.display = 'flex';
+                            showVictory();
                         }
                     }, 1000);
                 }, 800);

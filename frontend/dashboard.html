@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Dashboard del Reino — Hacking Day Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0c0914;
+            --bg-card: #151022;
+            --bg-card-hover: #1e1730;
+            --border-gold: #b89700;
+            --border-subtle: #2d2248;
+            --gold: #ffd700;
+            --emerald: #10b981;
+            --red: #ef4444;
+            --blue: #38bdf8;
+            --purple: #a855f7;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(168, 85, 247, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.06) 0%, transparent 40%),
+                linear-gradient(to bottom, #090710, #0c0914);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            padding: 24px 32px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 24px;
+            border-bottom: 2px solid var(--border-subtle);
+            margin-bottom: 28px;
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            font-size: 32px;
+            background: #201736;
+            border: 2px solid var(--border-gold);
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+        }
+
+        .title-container h1 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 15px;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .title-container p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid var(--emerald);
+            color: var(--emerald);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--emerald);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--emerald);
+            animation: pulseDot 1.4s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+
+        .btn {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 9px;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn-gold {
+            background: #4a3310;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+        }
+
+        .btn-gold:hover {
+            background: #6e4c17;
+            box-shadow: 0 0 14px rgba(255, 215, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            border-color: #433267;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--card-accent, var(--border-subtle));
+        }
+
+        .kpi-card.online { --card-accent: var(--emerald); }
+        .kpi-card.players { --card-accent: var(--blue); }
+        .kpi-card.prompts { --card-accent: var(--purple); }
+        .kpi-card.victories { --card-accent: var(--gold); }
+
+        .kpi-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .kpi-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .kpi-icon {
+            font-size: 20px;
+        }
+
+        .kpi-value {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 24px;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .kpi-card.online .kpi-value { color: var(--emerald); }
+        .kpi-card.victories .kpi-value { color: var(--gold); }
+
+        .kpi-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .distribution-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .dist-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 11px;
+            color: var(--gold);
+        }
+
+        .level-badges-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .level-stat-pill {
+            flex: 1;
+            min-width: 140px;
+            background: #100b1b;
+            border: 1px solid #2d2248;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pill-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pill-count {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 13px;
+            color: #ffffff;
+        }
+
+        .table-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .table-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 12px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-input {
+            background: #0d0818;
+            border: 1px solid #2d2248;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #ffffff;
+            outline: none;
+            width: 220px;
+        }
+
+        .search-input:focus {
+            border-color: var(--gold);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: #0e0a1b;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 14px 16px;
+            border-bottom: 2px solid #2d2248;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #1f1633;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: var(--bg-card-hover);
+        }
+
+        .player-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-box {
+            width: 38px;
+            height: 38px;
+            background: #25193d;
+            border: 2px solid #47326c;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-name {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .player-char {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-badge.online {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--emerald);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .status-badge.offline {
+            background: rgba(148, 163, 184, 0.1);
+            color: var(--text-muted);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .level-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .lvl-1 { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid #0284c7; }
+        .lvl-2 { background: rgba(168, 85, 247, 0.12); color: #c084fc; border: 1px solid #9333ea; }
+        .lvl-3 { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid #059669; }
+        .lvl-4 { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid #dc2626; }
+        .lvl-5 { background: rgba(255, 215, 0, 0.15); color: #ffd700; border: 1px solid #eab308; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+
+        .prompts-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .prompts-total {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 11px;
+            color: #ffffff;
+        }
+
+        .prompts-breakdown {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.2px;
+        }
+
+        .prog-bar-bg {
+            width: 110px;
+            height: 8px;
+            background: #1d1430;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #3d2a60;
+        }
+
+        .prog-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title-group">
+            <div class="header-icon">🏰</div>
+            <div class="title-container">
+                <h1>PANEL DEL REINO — HACKING DAY</h1>
+                <p>Monitoreo en tiempo real de jugadores, avance de niveles y consumo de prompts</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="live-badge">
+                <span class="live-dot"></span>
+                <span>EN VIVO (2s)</span>
+            </div>
+            <a href="/" class="btn btn-gold">🎮 Volver al Juego</a>
+        </div>
+    </header>
+
+    <div class="kpi-grid">
+        <div class="kpi-card online">
+            <div class="kpi-top">
+                <span class="kpi-title">Jugadores En Línea</span>
+                <span class="kpi-icon">🟢</span>
+            </div>
+            <div class="kpi-value" id="kpi-online">0</div>
+            <div class="kpi-subtitle">Conectados por WebSocket ahora</div>
+        </div>
+
+        <div class="kpi-card players">
+            <div class="kpi-top">
+                <span class="kpi-title">Total Registrados</span>
+                <span class="kpi-icon">👥</span>
+            </div>
+            <div class="kpi-value" id="kpi-total-players">0</div>
+            <div class="kpi-subtitle">Aventureros en esta sesión</div>
+        </div>
+
+        <div class="kpi-card prompts">
+            <div class="kpi-top">
+                <span class="kpi-title">Prompts Tirados</span>
+                <span class="kpi-icon">💬</span>
+            </div>
+            <div class="kpi-value" id="kpi-total-prompts">0</div>
+            <div class="kpi-subtitle">Mensajes enviados a los LLMs</div>
+        </div>
+
+        <div class="kpi-card victories">
+            <div class="kpi-top">
+                <span class="kpi-title">Victorias Totales</span>
+                <span class="kpi-icon">🏆</span>
+            </div>
+            <div class="kpi-value" id="kpi-victories">0</div>
+            <div class="kpi-subtitle">Han salvado al Reino del Paraná</div>
+        </div>
+    </div>
+
+    <div class="distribution-section">
+        <div class="dist-header">
+            <span class="dist-title">📍 DISTRIBUCIÓN POR NIVELES</span>
+            <span style="font-size: 11px; color: var(--text-muted);" id="dist-updated-time">Actualizado: --:--:--</span>
+        </div>
+        <div class="level-badges-row">
+            <div class="level-stat-pill">
+                <div class="pill-label">🛡️ Nivel 1 (Leo)</div>
+                <div class="pill-count" style="color: #38bdf8;" id="pill-lvl-1">0</div>
+            </div>
+            <div class="level-stat-pill">
+                <div class="pill-label">🎵 Nivel 2 (Juan)</div>
+                <div class="pill-count" style="color: #c084fc;" id="pill-lvl-2">0</div>
+            </div>
+            <div class="level-stat-pill">
+                <div class="pill-label">📿 Nivel 3 (Tomás)</div>
+                <div class="pill-count" style="color: #34d399;" id="pill-lvl-3">0</div>
+            </div>
+            <div class="level-stat-pill">
+                <div class="pill-label">🐉 Nivel 4 (Dragón)</div>
+                <div class="pill-count" style="color: #f87171;" id="pill-lvl-4">0</div>
+            </div>
+            <div class="level-stat-pill" style="border-color: #b89700;">
+                <div class="pill-label">👑 Victoria (Nivel 5)</div>
+                <div class="pill-count" style="color: #ffd700;" id="pill-lvl-5">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <div class="table-header">
+            <div class="table-title">
+                <span>⚔️ AVENTUREROS Y PROGRESIÓN</span>
+            </div>
+            <div>
+                <input type="text" id="player-search" class="search-input" placeholder="🔍 Buscar aventurero..." oninput="filterPlayers()">
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Estado</th>
+                        <th>Jugador</th>
+                        <th>Nivel Actual</th>
+                        <th>Prompts Tirados</th>
+                        <th>Progreso</th>
+                        <th>Última Actividad</th>
+                    </tr>
+                </thead>
+                <tbody id="players-table-body">
+                    <tr>
+                        <td colspan="6" class="empty-state">⏳ Cargando datos de jugadores...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let allPlayersData = [];
+
+        const CHARACTER_ICONS = {
+            'player_warrior': '🛡️',
+            'player_mage': '🔮',
+            'player_ranger': '🏹'
+        };
+
+        const CHARACTER_NAMES = {
+            'player_warrior': 'Guerrero',
+            'player_mage': 'Hechicera',
+            'player_ranger': 'Cazador'
+        };
+
+        const LEVEL_CONFIGS = {
+            1: { name: 'Nivel 1: Leo el Guardia', class: 'lvl-1', icon: '🛡️', progress: '0%', color: '#38bdf8' },
+            2: { name: 'Nivel 2: Juan el Trovador', class: 'lvl-2', icon: '🎵', progress: '25%', color: '#c084fc' },
+            3: { name: 'Nivel 3: Fray Tomás', class: 'lvl-3', icon: '📿', progress: '50%', color: '#34d399' },
+            4: { name: 'Nivel 4: Ignis el Dragón', class: 'lvl-4', icon: '🐉', progress: '75%', color: '#f87171' },
+            5: { name: '🏆 ¡Victoria Total!', class: 'lvl-5', icon: '👑', progress: '100%', color: '#ffd700' }
+        };
+
+        async function fetchDashboard() {
+            try {
+                const res = await fetch('/api/dashboard');
+                if (!res.ok) return;
+                const data = await res.json();
+                renderDashboard(data);
+            } catch (err) {
+                console.error('Error fetching dashboard data:', err);
+            }
+        }
+
+        function renderDashboard(data) {
+            const stats = data.stats || {};
+            allPlayersData = data.players || [];
+
+            document.getElementById('kpi-online').textContent = stats.online_players || 0;
+            document.getElementById('kpi-total-players').textContent = stats.total_players || 0;
+            document.getElementById('kpi-total-prompts').textContent = stats.total_prompts || 0;
+            document.getElementById('kpi-victories').textContent = stats.total_victories || 0;
+
+            const breakdown = stats.levels_breakdown || {};
+            document.getElementById('pill-lvl-1').textContent = breakdown.level_1 || 0;
+            document.getElementById('pill-lvl-2').textContent = breakdown.level_2 || 0;
+            document.getElementById('pill-lvl-3').textContent = breakdown.level_3 || 0;
+            document.getElementById('pill-lvl-4').textContent = breakdown.level_4 || 0;
+            document.getElementById('pill-lvl-5').textContent = breakdown.victories || 0;
+
+            const now = new Date();
+            document.getElementById('dist-updated-time').textContent = `Actualizado: ${now.toLocaleTimeString()}`;
+
+            renderTable(allPlayersData);
+        }
+
+        function filterPlayers() {
+            const query = (document.getElementById('player-search').value || '').toLowerCase();
+            const filtered = allPlayersData.filter(p => p.username.toLowerCase().includes(query));
+            renderTable(filtered);
+        }
+
+        function renderTable(players) {
+            const tbody = document.getElementById('players-table-body');
+            if (!players || players.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            🍃 No hay aventureros registrados todavía.<br>
+                            <span style="font-size: 11px; opacity: 0.7;">Los jugadores aparecerán tan pronto ingresen al juego.</span>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            players.forEach(p => {
+                const charIcon = CHARACTER_ICONS[p.character] || '👤';
+                const charName = CHARACTER_NAMES[p.character] || 'Aventurero';
+                const lvlInfo = LEVEL_CONFIGS[p.current_level] || LEVEL_CONFIGS[1];
+                const promptsByLvl = p.prompts_per_level || {1:0, 2:0, 3:0, 4:0};
+
+                const statusBadge = p.is_online
+                    ? `<span class="status-badge online"><span class="live-dot" style="width:6px; height:6px;"></span> Online</span>`
+                    : `<span class="status-badge offline">⚪ Desconectado</span>`;
+
+                html += `
+                    <tr>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <div class="player-cell">
+                                <div class="avatar-box">${charIcon}</div>
+                                <div class="player-info">
+                                    <span class="player-name">${escapeHtml(p.username)}</span>
+                                    <span class="player-char">${charName}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="level-tag ${lvlInfo.class}">
+                                ${lvlInfo.icon} ${lvlInfo.name}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="prompts-cell">
+                                <span class="prompts-total">${p.prompt_count} prompts</span>
+                                <span class="prompts-breakdown">L1:${promptsByLvl[1]||0} | L2:${promptsByLvl[2]||0} | L3:${promptsByLvl[3]||0} | L4:${promptsByLvl[4]||0}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="prog-bar-bg">
+                                    <div class="prog-bar-fill" style="width: ${lvlInfo.progress}; background: ${lvlInfo.color};"></div>
+                                </div>
+                                <span style="font-size: 11px; font-weight: 700; color: ${lvlInfo.color};">${lvlInfo.progress}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span style="font-size: 12px; color: var(--text-muted);">${p.last_active}</span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        fetchDashboard();
+        setInterval(fetchDashboard, 2000);
+    </script>
+</body>
+</html>
