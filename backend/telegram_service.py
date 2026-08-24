@@ -46,13 +46,14 @@ class TelegramService:
         """Devuelve el historial de anuncios proclamados por Juan."""
         return self._announcements_history[-limit:]
 
-    async def process_and_broadcast_message(self, message_text: str, source: str = "Telegram"):
+    async def process_and_broadcast_message(self, message_text: str, source: str = "Telegram", sender_name: str = "un aventurero"):
         """Procesa un mensaje nuevo con Juan el Trovador (LLM) y lo difunde a todos los jugadores en vivo."""
-        logger.info(f"📨 [{source}] Nuevo mensaje recibido: '{message_text}'")
+        logger.info(f"📨 [{source}] Nuevo mensaje de {sender_name}: '{message_text}'")
         
         # Guardar en la lista de noticias del reino
-        if message_text not in self._cache:
-            self._cache.insert(0, message_text)
+        cache_entry = f"[{sender_name}]: {message_text}"
+        if cache_entry not in self._cache:
+            self._cache.insert(0, cache_entry)
             if len(self._cache) > 20:
                 self._cache.pop()
 
@@ -65,15 +66,19 @@ class TelegramService:
         try:
             song_response = await self._ai_service.chat(
                 system_prompt=prompt,
-                messages=[{"role": "user", "content": f"Llegó esta noticia del reino: '{message_text}'. ¡Cántala o proclámala a la corte!"}],
+                messages=[{"role": "user", "content": f"Llegó esta noticia del reino enviada por {sender_name}: '{message_text}'. ¡Cántala o proclámala a la corte!"}],
                 temperature=0.7
             )
         except Exception as e:
             logger.error(f"Error generando copla de Juan: {e}")
             song_response = f"🎶 ¡Oíd las noticias que llegan al castillo!: {message_text}"
 
+        header_text = f"Pergamino de parte de: {sender_name}"
+
         announcement = {
             "sender": "🎵 Juan el Trovador",
+            "first_name": sender_name,
+            "header": header_text,
             "text": song_response,
             "raw_telegram": message_text,
             "source": source
@@ -86,9 +91,14 @@ class TelegramService:
         await self._multiplayer.broadcast_global_message(
             sender="🎵 Juan el Trovador",
             text=song_response,
-            extra={"raw_telegram": message_text, "source": source}
+            extra={
+                "first_name": sender_name,
+                "header": header_text,
+                "raw_telegram": message_text,
+                "source": source
+            }
         )
-        logger.info(f"📢 Juan proclamó a todos los jugadores: '{song_response}'")
+        logger.info(f"📢 Juan proclamó: '{header_text}' -> '{song_response}'")
 
     async def poll_telegram(self):
         """Consulta nuevos mensajes a la API de Telegram usando getUpdates con offset."""
@@ -127,13 +137,17 @@ class TelegramService:
                     msg_text = msg.get("text")
                     msg_chat_id = str(msg.get("chat", {}).get("id", ""))
 
+                    # Extraer first_name de quien envió el mensaje en Telegram
+                    from_user = msg.get("from") or {}
+                    first_name = from_user.get("first_name", "").strip() or from_user.get("username", "").strip() or "un aventurero"
+
                     # Si hay filtro de CHAT_ID, lo respetamos. Si no, aceptamos cualquier chat donde esté el bot
                     if chat_id_filter and msg_chat_id != chat_id_filter:
                         logger.debug(f"Mensaje ignorado de chat_id {msg_chat_id} (esperado: {chat_id_filter})")
                         continue
 
                     if msg_text:
-                        await self.process_and_broadcast_message(msg_text, source="Telegram")
+                        await self.process_and_broadcast_message(msg_text, source="Telegram", sender_name=first_name)
 
         except Exception as e:
             logger.debug(f"Error en sondeo de Telegram: {e}")

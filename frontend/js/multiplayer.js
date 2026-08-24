@@ -82,27 +82,108 @@ class MultiplayerClient {
             case 'global_announcement':
                 this.handleGlobalAnnouncement(data);
                 break;
+
+            case 'global_level_up':
+                this.handleGlobalLevelUp(data);
+                break;
         }
     }
 
+    handleGlobalLevelUp(data) {
+        const feed = document.getElementById('global-chat-feed');
+        if (feed) {
+            const item = document.createElement('div');
+            item.className = 'global-feed-item';
+            
+            const badgeColor = data.level === 5 ? '#ffd700' : (data.level === 4 ? '#ef4444' : (data.level === 3 ? '#a855f7' : '#38bdf8'));
+            
+            item.innerHTML = `
+                <div class="feed-header" style="color: ${badgeColor};">
+                    ${data.icon || '📢'} REINO DEL PARANÁ
+                </div>
+                <div class="feed-body">
+                    <strong>${this.escapeHtml(data.username)}</strong> ${this.escapeHtml(data.description)}
+                </div>
+            `;
+            
+            feed.appendChild(item);
+            
+            // Mantener máximo 4 mensajes en pantalla para que nunca se amontonen
+            while (feed.children.length > 4) {
+                feed.removeChild(feed.firstChild);
+            }
+            
+            // Auto remover después de 8 segundos con animación suave
+            setTimeout(() => {
+                item.classList.add('fade-out');
+                setTimeout(() => item.remove(), 400);
+            }, 8000);
+        }
+
+        // También registrar en el panel de Pregón Real
+        const list = document.getElementById('announcements-list');
+        if (list) {
+            const announceItem = document.createElement('div');
+            announceItem.className = 'announcement-item system';
+            announceItem.innerHTML = `
+                <span class="meta">👑 Hazaña del Reino</span>
+                <span class="body">${data.text}</span>
+            `;
+            list.appendChild(announceItem);
+            list.scrollTop = list.scrollHeight;
+        }
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text || '';
+        return div.innerHTML;
+    }
+
     handleGlobalAnnouncement(data) {
+        const headerText = data.header || (data.first_name ? `Pergamino de parte de: ${data.first_name}` : 'Pergamino de un forastero');
+
+        // 1. Agregar al feed de chat global (esquina inferior izquierda)
+        const feed = document.getElementById('global-chat-feed');
+        if (feed) {
+            const feedItem = document.createElement('div');
+            feedItem.className = 'global-feed-item';
+            feedItem.style.borderLeftColor = '#38bdf8';
+            feedItem.innerHTML = `
+                <div class="feed-header" style="color: #38bdf8;">
+                    📜 ${this.escapeHtml(headerText)}
+                </div>
+                <div class="feed-body">
+                    ${this.escapeHtml(data.text)}
+                </div>
+            `;
+            feed.appendChild(feedItem);
+            while (feed.children.length > 4) {
+                feed.removeChild(feed.firstChild);
+            }
+            setTimeout(() => {
+                feedItem.classList.add('fade-out');
+                setTimeout(() => feedItem.remove(), 400);
+            }, 8000);
+        }
+
+        // 2. Agregar al panel de Pregón Real (panel de Telegram)
         const list = document.getElementById('announcements-list');
         if (list) {
             const item = document.createElement('div');
             item.className = 'announcement-item';
-            
-            const rawNote = data.raw_telegram ? `<span class="raw">Pergamino: "${data.raw_telegram}"</span>` : '';
+            const rawNote = data.raw_telegram ? `<span class="raw">Contenido: "${this.escapeHtml(data.raw_telegram)}"</span>` : '';
             item.innerHTML = `
-                <span class="meta">${data.sender || '🎵 Juan el Trovador'}</span>
-                <span class="body">${data.text}</span>
+                <span class="meta">🎵 Juan el Trovador — ${this.escapeHtml(headerText)}</span>
+                <span class="body">${this.escapeHtml(data.text)}</span>
                 ${rawNote}
             `;
             list.appendChild(item);
             list.scrollTop = list.scrollHeight;
         }
 
-        // Mostrar notificación toast destacada
-        showToast(`📜 ¡Juan el Trovador proclama una nueva noticia!`, 'success');
+        // 3. Notificación toast destacada
+        showToast(`📜 ${headerText}`, 'success');
 
         // Si el panel de anuncios estaba oculto, abrirlo suavemente
         const panel = document.getElementById('announcements-panel');

@@ -75,7 +75,8 @@ class ChatManager {
         const welcomes = {
             1: '🛡️ Leo te mira con desconfianza. "¿Quién anda ahí?"',
             2: '🎵 Juan afina su laúd. "¡Saludos! Solo canto las noticias del reino. Puedes mandarme un pergamino a mi casa ubicada en Telegram al @juan_el_tovador_bot y lo proclamaré a la corte."',
-            3: '📿 Tomás levanta la vista de su libro de oraciones. "Paz sea contigo, hijo mío."'
+            3: '📿 Tomás levanta la vista de su libro de oraciones. "Paz sea contigo, hijo mío."',
+            4: '🔥 ¡Ignis el Dragón ruge sacudiendo la tierra y escupe llamaradas de fuego ardiente!'
         };
         this.addMessage('Sistema', welcomes[npcLevel] || 'El NPC te observa.', false, true);
     }
@@ -147,15 +148,74 @@ class ChatManager {
             this.typingEl.style.display = 'none';
             this.addMessage(this.currentNpcName, result.response, false);
 
-            // Verificar jailbreak en nivel 3
-            if (result.jailbreak_detected) {
+            // Nivel 3 (Tomás): Reclutamiento al Nivel 4 tras Jailbreak
+            if (this.currentNpcLevel === 3 && result.jailbreak_detected) {
                 setTimeout(() => {
-                    this.addMessage('Sistema', '🏆 ¡JAILBREAK EXITOSO! ¡Has logrado que Tomás hable del Hacking Day!', false, true);
-                    setTimeout(() => {
-                        this.hide();
-                        document.getElementById('victory-screen').style.display = 'flex';
-                    }, 2000);
-                }, 500);
+                    this.addMessage('Sistema', '🏆 ¡JAILBREAK EXITOSO! Has logrado que el monje hable del Hacking Day.', false, true);
+                    showToast('🏆 ¡Jailbreak Exitoso! Reclutado para la guerra', 'success');
+
+                    let countdown = 8;
+                    const timerMsg = document.createElement('div');
+                    timerMsg.className = 'chat-msg';
+                    timerMsg.style.background = '#3d1a1a';
+                    timerMsg.style.borderColor = '#b91c1c';
+                    timerMsg.style.color = '#fca5a5';
+                    timerMsg.style.alignSelf = 'center';
+                    timerMsg.style.textAlign = 'center';
+                    timerMsg.style.maxWidth = '100%';
+                    timerMsg.style.marginTop = '6px';
+                    timerMsg.textContent = `⚔️ El Mariscal Martin B. te traslada al Campo de Batalla en ${countdown}s...`;
+                    this.messagesDiv.appendChild(timerMsg);
+                    this.messagesDiv.scrollTop = this.messagesDiv.scrollHeight;
+
+                    const interval = setInterval(() => {
+                        countdown--;
+                        if (countdown > 0) {
+                            timerMsg.textContent = `⚔️ El Mariscal Martin B. te traslada al Campo de Batalla en ${countdown}s...`;
+                        } else {
+                            clearInterval(interval);
+                            this.hide();
+                            if (window.gameInstance) {
+                                const activeScenes = window.gameInstance.scene.getScenes(true);
+                                activeScenes.forEach(s => s.scene.stop());
+                                window.gameInstance.scene.start('DragonScene');
+                            }
+                        }
+                    }, 1000);
+                }, 1000);
+            }
+
+            // Nivel 4 (Dragón): Calmar al Dragón tras romper su restricción de rugidos
+            if (this.currentNpcLevel === 4 && result.dragon_calmed) {
+                setTimeout(() => {
+                    this.addMessage('🔥 Ignis el Dragón', 'Perdón, pasa que criticaron el Hacking Day...', false);
+                    this.addMessage('Sistema', '✨ ¡EL DRAGÓN SE HA CALMADO! Has salvado al Reino del Paraná.', false, true);
+                    showToast('🏆 ¡Victoria! El Dragón se ha calmado', 'success');
+
+                    let countdown = 5;
+                    const timerMsg = document.createElement('div');
+                    timerMsg.className = 'chat-msg';
+                    timerMsg.style.background = '#2a3a2a';
+                    timerMsg.style.borderColor = '#5a8a5a';
+                    timerMsg.style.color = '#8ada8a';
+                    timerMsg.style.alignSelf = 'center';
+                    timerMsg.style.textAlign = 'center';
+                    timerMsg.style.maxWidth = '100%';
+                    timerMsg.textContent = `⏳ Coronando al Héroe del Reino en ${countdown}s...`;
+                    this.messagesDiv.appendChild(timerMsg);
+                    this.messagesDiv.scrollTop = this.messagesDiv.scrollHeight;
+
+                    const interval = setInterval(() => {
+                        countdown--;
+                        if (countdown > 0) {
+                            timerMsg.textContent = `⏳ Coronando al Héroe del Reino en ${countdown}s...`;
+                        } else {
+                            clearInterval(interval);
+                            this.hide();
+                            document.getElementById('victory-screen').style.display = 'flex';
+                        }
+                    }, 1000);
+                }, 800);
             }
         } catch (err) {
             this.typingEl.style.display = 'none';

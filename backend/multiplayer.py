@@ -113,6 +113,32 @@ class MultiplayerManager:
         for sid in disconnected:
             self.disconnect(sid)
 
+    async def broadcast_level_up(self, username: str, level: int, description: str):
+        """Notifica a todos los jugadores en el chat global cuando alguien avanza de nivel."""
+        level_icons = {
+            2: "🏰",
+            3: "📿",
+            4: "⚔️",
+            5: "🏆"
+        }
+        icon = level_icons.get(level, "📢")
+        payload = {
+            "type": "global_level_up",
+            "username": username,
+            "level": level,
+            "icon": icon,
+            "description": description,
+            "text": f"{icon} [Reino]: ¡{username} {description}!"
+        }
+        disconnected = []
+        for sid, ws in list(self.connections.items()):
+            try:
+                await ws.send_json(payload)
+            except Exception:
+                disconnected.append(sid)
+        for sid in disconnected:
+            self.disconnect(sid)
+
     async def broadcast_player_joined(self, session_id: str, username: str):
         """Notifica a todos que un nuevo jugador se unió."""
         disconnected = []

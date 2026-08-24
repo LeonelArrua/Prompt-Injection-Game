@@ -6,7 +6,7 @@ class BootScene extends Phaser.Scene {
     }
 
     preload() {
-        // No se cargan assets externos — todo se genera por código
+        this.load.image('dragon', 'assets/dragon.png');
     }
 
     create() {

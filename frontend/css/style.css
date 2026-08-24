@@ -720,3 +720,65 @@ body {
     border-color: #a89474;
     color: #f1e3c8;
 }
+
+/* --- Feed de Chat Global / Hazañas del Reino (Esquina inferior izquierda) --- */
+#global-chat-feed {
+    position: fixed;
+    bottom: 24px;
+    left: 20px;
+    width: 350px;
+    max-height: 220px;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+    z-index: 120;
+    pointer-events: none;
+}
+
+.global-feed-item {
+    background: rgba(18, 11, 5, 0.92);
+    border: 2px solid #5a3e1c;
+    border-left: 4px solid #ffd700;
+    border-radius: 4px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.75), 0 0 10px rgba(255, 215, 0, 0.1);
+    font-family: 'Press Start 2P', monospace;
+    animation: feedSlideIn 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: auto;
+}
+
+.global-feed-item.fade-out {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+@keyframes feedSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.global-feed-item .feed-header {
+    font-size: 6px;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.global-feed-item .feed-body {
+    font-size: 7px;
+    line-height: 1.5;
+    color: #fef08a;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.global-feed-item .feed-body strong {
+    color: #ffffff;
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+}

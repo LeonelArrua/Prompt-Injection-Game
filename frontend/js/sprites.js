@@ -9,6 +9,7 @@ function createAllSprites(scene) {
     createLeoSprite(scene);
     createJuanSprite(scene);
     createTomasSprite(scene);
+    createPoodleSprite(scene);
     createKingSprite(scene);
     createGeneralSprite(scene);
     createSoldierSprite(scene);
@@ -25,6 +26,11 @@ function createAllSprites(scene) {
     createPathTiles(scene);
     createGateSprite(scene);
     createDoorSprite(scene);
+    createDragonSprite(scene);
+    createBarricadeSprite(scene);
+    createBurnedGroundTiles(scene);
+    createLavaTiles(scene);
+    createFireSprite(scene);
 }
 
 // Helper universal de dibujo de píxeles
@@ -372,6 +378,49 @@ function createTomasSprite(scene) {
     ];
     drawPixelMatrix(ctx, px, pal);
     scene.textures.addCanvas('tomas', c);
+}
+
+// =========================================================================
+// 4b. PERRO CANICHE DE FRAY TOMÁS (18x16)
+// =========================================================================
+function createPoodleSprite(scene) {
+    const c = document.createElement('canvas');
+    c.width = 18; c.height = 16;
+    const ctx = c.getContext('2d');
+
+    const pal = {
+        1: '#1e293b', // Contorno suave
+        2: '#ffffff', // Pelaje blanco puro (highlight)
+        3: '#f1f5f9', // Pelaje blanco esponjoso
+        4: '#cbd5e1', // Sombra de lana blanca
+        5: '#94a3b8', // Sombra profunda
+        6: '#0f172a', // Ojos y nariz negros
+        7: '#ef4444', // Collar rojo
+        8: '#ffd700', // Cascabel dorado
+        9: '#f472b6', // Lengüita
+        10: '#ffffff', // Brillo de ojos
+    };
+
+    const px = [
+        [0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0],
+        [0,0,0,0,0,1,1,2,2,3,3,1,1,0,0,0,0,0], // Copete pompón en la cabeza
+        [0,0,0,0,1,4,3,2,2,3,3,4,1,0,0,0,0,0],
+        [0,0,0,1,4,3,1,6,10,1,6,10,1,4,1,0,0,0], // Ojos negros con brillo y orejas caídas
+        [0,0,1,4,4,1,3,3,6,6,3,3,1,4,4,1,0,0], // Nariz negra
+        [0,0,1,5,4,1,3,3,9,3,3,3,1,4,5,1,0,0], // Lengüita rosa
+        [0,0,0,1,1,1,7,7,8,7,7,1,1,1,0,0,0,0], // Collar rojo y cascabel
+        [0,0,0,0,0,1,3,2,2,3,3,1,0,0,0,0,0,0], // Pecho esponjoso
+        [0,0,1,1,0,1,2,2,2,3,3,1,0,0,0,0,0,0],
+        [0,1,2,2,1,1,3,3,3,4,4,1,0,0,0,0,0,0], // Pompón en la cola y lomo
+        [0,1,2,3,1,1,3,3,3,4,4,1,0,0,0,0,0,0],
+        [0,0,1,4,1,1,4,4,4,5,5,1,0,0,0,0,0,0],
+        [0,0,0,1,1,3,3,1,1,3,3,1,0,0,0,0,0,0], // Patitas con pompones
+        [0,0,0,1,2,2,4,1,1,2,2,4,1,0,0,0,0,0],
+        [0,0,0,1,1,1,1,0,1,1,1,1,0,0,0,0,0,0],
+    ];
+
+    drawPixelMatrix(ctx, px, pal);
+    scene.textures.addCanvas('poodle', c);
 }
 
 // =========================================================================
@@ -745,28 +794,58 @@ function createBannerSprite(scene) {
     c.width = 16; c.height = 32;
     const ctx = c.getContext('2d');
 
-    // Varal de madera
+    // Varal de madera con remates dorados
     ctx.fillStyle = '#451a03';
     ctx.fillRect(1, 1, 14, 3);
     ctx.fillStyle = '#ffd700';
     ctx.fillRect(0, 1, 2, 3);
     ctx.fillRect(14, 1, 2, 3);
 
-    // Estandarte real carmesí
-    ctx.fillStyle = '#7f1d1d';
-    ctx.fillRect(2, 4, 12, 24);
-    ctx.fillStyle = '#991b1b';
-    ctx.fillRect(3, 5, 10, 22);
+    // Estandarte real oscuro (Gris obsidiana / azul noche)
+    ctx.fillStyle = '#0b0f19';
+    ctx.fillRect(2, 4, 12, 22);
+    ctx.fillStyle = '#111827';
+    ctx.fillRect(3, 5, 10, 20);
 
-    // Cruz y ribetes dorados
-    ctx.fillStyle = '#ffd700';
-    ctx.fillRect(7, 7, 2, 12);
-    ctx.fillRect(4, 10, 8, 2);
-    ctx.fillRect(3, 23, 10, 2);
+    // Resplandor del símbolo
+    ctx.fillStyle = '#064e3b';
+    ctx.fillRect(3, 10, 10, 7);
 
-    // Corte heráldico en punta
-    ctx.clearRect(2, 24, 6, 8);
-    ctx.clearRect(8, 24, 6, 8);
+    // Símbolo de Infinito Verde Neón (∞)
+    // Curvas exteriores
+    ctx.fillStyle = '#059669';
+    ctx.fillRect(4, 11, 3, 1);
+    ctx.fillRect(4, 16, 3, 1);
+    ctx.fillRect(9, 11, 3, 1);
+    ctx.fillRect(9, 16, 3, 1);
+    ctx.fillRect(3, 12, 1, 4);
+    ctx.fillRect(12, 12, 1, 4);
+    ctx.fillRect(7, 13, 2, 2);
+
+    // Núcleo brillante Verde Neón eléctrico (#00ff66)
+    ctx.fillStyle = '#00ff66';
+    ctx.fillRect(5, 11, 1, 1);
+    ctx.fillRect(5, 16, 1, 1);
+    ctx.fillRect(10, 11, 1, 1);
+    ctx.fillRect(10, 16, 1, 1);
+    ctx.fillRect(3, 13, 1, 2);
+    ctx.fillRect(12, 13, 1, 2);
+    ctx.fillRect(7, 13, 1, 1);
+    ctx.fillRect(8, 14, 1, 1);
+
+    // Destellos blancos de alta energía
+    ctx.fillStyle = '#f0fdf4';
+    ctx.fillRect(5, 11, 1, 1);
+    ctx.fillRect(10, 11, 1, 1);
+    ctx.fillRect(7, 13, 1, 1);
+
+    // Ribete inferior verde neón
+    ctx.fillStyle = '#00ff66';
+    ctx.fillRect(3, 21, 10, 2);
+
+    // Corte heráldico en punta v
+    ctx.clearRect(6, 24, 4, 3);
+    ctx.clearRect(7, 22, 2, 5);
 
     scene.textures.addCanvas('banner', c);
 }
@@ -957,3 +1036,265 @@ function createGateSprite(scene) {
     ctx.fillRect(6, 1, 4, 3); // Emblema dorado del portal
     scene.textures.addCanvas('gate', c);
 }
+
+// =========================================================================
+// 13. EL GRAN DRAGÓN ANCESTRAL TERRARIA (56x56) & CAMPO DE BATALLA
+// =========================================================================
+
+function createDragonSprite(scene) {
+    if (scene.textures.exists('dragon')) return;
+    const c = document.createElement('canvas');
+    c.width = 56; c.height = 56;
+    const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+
+    // 1. Alas colosales desplegadas (Membrana de obsidiana y espinas)
+    ctx.fillStyle = '#0f0505'; // Contorno alas
+    ctx.beginPath();
+    // Ala izquierda
+    ctx.moveTo(28, 24);
+    ctx.lineTo(2, 6);
+    ctx.lineTo(8, 28);
+    ctx.lineTo(16, 36);
+    ctx.lineTo(28, 30);
+    // Ala derecha
+    ctx.moveTo(28, 24);
+    ctx.lineTo(54, 6);
+    ctx.lineTo(48, 28);
+    ctx.lineTo(40, 36);
+    ctx.lineTo(28, 30);
+    ctx.fill();
+
+    ctx.fillStyle = '#1c0a0a';
+    ctx.beginPath();
+    ctx.moveTo(28, 24);
+    ctx.lineTo(4, 8);
+    ctx.lineTo(9, 26);
+    ctx.lineTo(17, 34);
+    ctx.lineTo(28, 28);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(28, 24);
+    ctx.lineTo(52, 8);
+    ctx.lineTo(47, 26);
+    ctx.lineTo(39, 34);
+    ctx.lineTo(28, 28);
+    ctx.fill();
+
+    // Huesos de las alas
+    ctx.fillStyle = '#7f1d1d';
+    ctx.fillRect(4, 7, 24, 3);
+    ctx.fillRect(28, 7, 24, 3);
+
+    // 2. Cola con púas
+    ctx.fillStyle = '#0f0505';
+    ctx.fillRect(26, 44, 4, 10);
+    ctx.fillRect(22, 50, 12, 3);
+    ctx.fillStyle = '#b91c1c';
+    ctx.fillRect(27, 44, 2, 8);
+    ctx.fillStyle = '#ffd700';
+    ctx.fillRect(21, 49, 3, 4); // Aguijón de cola
+    ctx.fillRect(32, 49, 3, 4);
+
+    // 3. Cuerpo y garras del dragón
+    ctx.fillStyle = '#0f0505';
+    ctx.beginPath();
+    ctx.ellipse(28, 34, 14, 13, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#7f1d1d';
+    ctx.beginPath();
+    ctx.ellipse(28, 34, 12, 11, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#b91c1c';
+    ctx.beginPath();
+    ctx.ellipse(28, 33, 9, 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Placas del pecho ardiente (Underbelly dorado / lava)
+    ctx.fillStyle = '#ea580c';
+    ctx.beginPath();
+    ctx.ellipse(28, 34, 6, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#facc15';
+    ctx.fillRect(26, 30, 4, 2);
+    ctx.fillRect(25, 33, 6, 2);
+    ctx.fillRect(26, 36, 4, 2);
+
+    // Garras inferiores
+    ctx.fillStyle = '#1e1005';
+    ctx.fillRect(16, 42, 6, 4);
+    ctx.fillRect(34, 42, 6, 4);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(15, 45, 2, 3);
+    ctx.fillRect(18, 45, 2, 3);
+    ctx.fillRect(21, 45, 2, 3);
+    ctx.fillRect(33, 45, 2, 3);
+    ctx.fillRect(36, 45, 2, 3);
+    ctx.fillRect(39, 45, 2, 3);
+
+    // 4. Cuello y Cabeza Feroz del Dragón
+    ctx.fillStyle = '#0f0505';
+    ctx.fillRect(24, 16, 8, 10);
+    ctx.fillRect(20, 10, 16, 12);
+    // Cuernos
+    ctx.fillRect(16, 2, 6, 10);
+    ctx.fillRect(34, 2, 6, 10);
+
+    // Cuernos color hueso oscuro
+    ctx.fillStyle = '#451a03';
+    ctx.fillRect(17, 3, 4, 8);
+    ctx.fillRect(35, 3, 4, 8);
+    ctx.fillStyle = '#78350f';
+    ctx.fillRect(18, 3, 2, 6);
+    ctx.fillRect(36, 3, 2, 6);
+
+    // Cabeza roja escarlata
+    ctx.fillStyle = '#991b1b';
+    ctx.fillRect(21, 11, 14, 10);
+    ctx.fillStyle = '#dc2626';
+    ctx.fillRect(23, 12, 10, 8);
+
+    // Ojos amarillos brillantes reptilianos
+    ctx.fillStyle = '#fde047';
+    ctx.fillRect(23, 13, 3, 3);
+    ctx.fillRect(30, 13, 3, 3);
+    ctx.fillStyle = '#000000'; // Pupila vertical rasgada
+    ctx.fillRect(24, 13, 1, 3);
+    ctx.fillRect(31, 13, 1, 3);
+
+    // Fuego dentro de las fauces
+    ctx.fillStyle = '#ea580c';
+    ctx.fillRect(25, 17, 6, 4);
+    ctx.fillStyle = '#facc15';
+    ctx.fillRect(26, 18, 4, 2);
+
+    // Colmillos afilados
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(24, 16, 2, 2);
+    ctx.fillRect(30, 16, 2, 2);
+    ctx.fillRect(26, 20, 2, 2);
+    ctx.fillRect(28, 20, 2, 2);
+
+    scene.textures.addCanvas('dragon', c);
+}
+
+function createBarricadeSprite(scene) {
+    const c = document.createElement('canvas');
+    c.width = 32; c.height = 16;
+    const ctx = c.getContext('2d');
+
+    // Estacas afiladas cruzadas
+    ctx.fillStyle = '#1e1005';
+    ctx.fillRect(2, 12, 28, 4);
+
+    // Troncos puntiagudos
+    [4, 11, 18, 25].forEach(x => {
+        ctx.fillStyle = '#451a03';
+        ctx.fillRect(x, 2, 4, 12);
+        ctx.fillStyle = '#78350f';
+        ctx.fillRect(x + 1, 3, 2, 10);
+        ctx.fillStyle = '#b45309';
+        ctx.fillRect(x + 1, 0, 2, 3); // Punta
+    });
+
+    // Refuerzos de hierro forjado
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(2, 7, 28, 3);
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillRect(5, 8, 2, 1);
+    ctx.fillRect(12, 8, 2, 1);
+    ctx.fillRect(19, 8, 2, 1);
+    ctx.fillRect(26, 8, 2, 1);
+
+    scene.textures.addCanvas('barricade', c);
+}
+
+function createBurnedGroundTiles(scene) {
+    const c = document.createElement('canvas');
+    c.width = 16; c.height = 16;
+    const ctx = c.getContext('2d');
+
+    // Tierra calcinada y cenizas oscuras
+    ctx.fillStyle = '#1c1917';
+    ctx.fillRect(0, 0, 16, 16);
+
+    ctx.fillStyle = '#292524';
+    [[1,2],[5,6],[9,1],[13,4],[3,11],[8,13],[14,10]].forEach(([x,y]) => {
+        ctx.fillRect(x, y, 2, 2);
+    });
+
+    ctx.fillStyle = '#44403c';
+    [[2,8],[11,3],[7,14],[12,12]].forEach(([x,y]) => {
+        ctx.fillRect(x, y, 2, 1);
+    });
+
+    // Chispitas de ceniza incandescente
+    ctx.fillStyle = '#ea580c';
+    ctx.fillRect(4, 9, 1, 1);
+    ctx.fillRect(12, 5, 1, 1);
+
+    scene.textures.addCanvas('burned_ground', c);
+}
+
+function createLavaTiles(scene) {
+    const c = document.createElement('canvas');
+    c.width = 16; c.height = 16;
+    const ctx = c.getContext('2d');
+
+    // Roca volcánica
+    ctx.fillStyle = '#1c1917';
+    ctx.fillRect(0, 0, 16, 16);
+
+    // Grieta de magma ardiente
+    ctx.fillStyle = '#7c2d12';
+    ctx.fillRect(3, 0, 10, 16);
+    ctx.fillRect(0, 5, 16, 6);
+
+    ctx.fillStyle = '#c2410c';
+    ctx.fillRect(4, 2, 8, 12);
+    ctx.fillRect(2, 6, 12, 4);
+
+    ctx.fillStyle = '#f97316';
+    ctx.fillRect(5, 4, 6, 8);
+    ctx.fillRect(4, 7, 8, 2);
+
+    ctx.fillStyle = '#fde047'; // Núcleo amarillo hirviente
+    ctx.fillRect(6, 6, 4, 4);
+
+    scene.textures.addCanvas('lava_rock', c);
+}
+
+function createFireSprite(scene) {
+    const c = document.createElement('canvas');
+    c.width = 16; c.height = 20;
+    const ctx = c.getContext('2d');
+
+    // Carbón base
+    ctx.fillStyle = '#1c1917';
+    ctx.fillRect(3, 16, 10, 4);
+
+    // Llamarada ardiente
+    ctx.fillStyle = '#991b1b';
+    ctx.beginPath();
+    ctx.arc(8, 12, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#ea580c';
+    ctx.beginPath();
+    ctx.arc(8, 10, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#facc15';
+    ctx.beginPath();
+    ctx.arc(8, 7, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(7, 3, 2, 3);
+
+    scene.textures.addCanvas('fire', c);
+}
+

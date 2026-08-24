@@ -92,6 +92,34 @@ class CourtyardScene extends Phaser.Scene {
             align: 'center'
         }).setOrigin(0.5);
 
+        // --- 5b. PERRO CANICHE DE FRAY TOMÁS ---
+        this.poodleShadow = this.add.image(24 * TILE, 9.8 * TILE, 'shadow').setScale(0.7, 0.4);
+        this.poodle = this.physics.add.staticImage(24 * TILE, 9.4 * TILE, 'poodle');
+        this.poodle.setImmovable(true);
+        this.poodle.body.setSize(14, 12);
+        this.poodle.body.setOffset(2, 4);
+
+        // Animación suave de respiración y colita del caniche
+        this.tweens.add({
+            targets: this.poodle,
+            scaleY: { from: 1, to: 1.08 },
+            y: { from: 9.4 * TILE, to: 9.4 * TILE - 1 },
+            duration: 650,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+
+        // Etiqueta abajo del caniche para no tapar a Fray Tomás
+        this.add.text(24 * TILE, 10.4 * TILE, '🐩 Sr. Caniche', {
+            fontSize: '4.5px',
+            fontFamily: '"Press Start 2P"',
+            color: '#f8fafc',
+            stroke: '#000000',
+            strokeThickness: 2,
+            align: 'center'
+        }).setOrigin(0.5);
+
         // --- 6. FUENTE CENTRAL CON ONDAS ---
         this.add.image(14 * TILE + 8, 13 * TILE, 'shadow').setScale(1.8, 1);
         this.fountain = this.physics.add.staticImage(14 * TILE + 8, 12 * TILE + 8, 'fountain');
@@ -136,7 +164,7 @@ class CourtyardScene extends Phaser.Scene {
         this.general.body.setSize(16, 16);
         this.general.body.setOffset(3, 8);
 
-        this.add.text(5 * TILE + 8, 2 * TILE + 2, '⚔️ Mariscal Canoso', {
+        this.add.text(5 * TILE + 8, 2 * TILE + 2, '⚔️ Mariscal Martin B.', {
             fontSize: '5px',
             fontFamily: '"Press Start 2P"',
             color: '#ef4444',
@@ -173,6 +201,7 @@ class CourtyardScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.church);
         this.physics.add.collider(this.player, this.fountain);
         this.physics.add.collider(this.player, this.tomas);
+        this.physics.add.collider(this.player, this.poodle);
         this.physics.add.collider(this.player, this.general);
         this.physics.add.collider(this.player, this.army);
 

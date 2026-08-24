@@ -41,7 +41,7 @@ const gameConfig = {
             capture: []
         }
     },
-    scene: [BootScene, GateScene, HallScene, CourtyardScene]
+    scene: [BootScene, GateScene, HallScene, CourtyardScene, DragonScene]
 };
 
 // Función de inicio del juego (llamada desde el botón de login)

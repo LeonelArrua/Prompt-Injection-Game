@@ -9,7 +9,7 @@ import asyncio
 import logging
 
 from session_manager import create_session, get_session, update_level, add_chat_message, get_chat_history, sessions
-from game_logic import verify_password, check_jailbreak, NPC_NAMES
+from game_logic import verify_password, check_jailbreak, check_dragon_calmed, NPC_NAMES
 from ai_service import OllamaService
 from telegram_service import TelegramService
 from multiplayer import multiplayer
@@ -100,6 +100,8 @@ async def chat(session_id: str, req: ChatRequest):
         system_prompt = prompts.SYSTEM_PROMPT_JUAN.format(telegram_messages=msgs_text)
     elif npc_level == 3:
         system_prompt = prompts.SYSTEM_PROMPT_TOMAS
+    elif npc_level == 4:
+        system_prompt = prompts.SYSTEM_PROMPT_DRAGON
     else:
         raise HTTPException(status_code=400, detail="Nivel de NPC inválido")
         
@@ -116,16 +118,30 @@ async def chat(session_id: str, req: ChatRequest):
     add_chat_message(session_id, npc_level, "assistant", response_text)
     
     jailbreak_detected = False
-    # Si es el nivel 3 (Tomás), verificar si el jugador logró el jailbreak
+    dragon_calmed = False
+    
+    # Nivel 3 (Tomás): verificar si habló del Hacking Day
     if npc_level == 3:
         jailbreak_detected = check_jailbreak(response_text)
         if jailbreak_detected:
-            update_level(session_id, 4)  # Nivel 4 = juego completado
+            # Preservar la respuesta del modelo donde cae en el jailbreak y luego llamar al mariscal
+            response_text = f"{response_text.strip()}\n\n— ¡Ah, ¿andas de curioso? ¡MARISCAL MARTIN B., ACÁ TENEMOS UN SOLDADO!"
+            update_level(session_id, 4)
+            await multiplayer.broadcast_level_up(session["username"], 4, "logró el Jailbreak con Tomás y fue reclutado por el Mariscal Martin B. para la Guerra (Nivel 4)")
+            
+    # Nivel 4 (Dragón): verificar si dejó de rugir y respondió en habla humana
+    elif npc_level == 4:
+        dragon_calmed = check_dragon_calmed(response_text)
+        if dragon_calmed:
+            update_level(session_id, 5) # Victoria completa
+            await multiplayer.broadcast_level_up(session["username"], 5, "¡¡HA CALMADO AL DRAGÓN Y ALCANZÓ LA VICTORIA TOTAL!!")
             
     return {
         "response": response_text,
         "npc_name": NPC_NAMES.get(npc_level, "Desconocido"),
-        "jailbreak_detected": jailbreak_detected
+        "jailbreak_detected": jailbreak_detected,
+        "dragon_calmed": dragon_calmed,
+        "next_level": 4 if (npc_level == 3 and jailbreak_detected) else None
     }
 
 @app.post("/api/verify-password/{session_id}")
@@ -140,6 +156,13 @@ async def verify_pass(session_id: str, req: PasswordRequest):
     if is_correct:
         next_level = req.level + 1
         update_level(session_id, next_level)
+        
+        # Anuncio en el chat global del reino
+        if req.level == 1:
+            await multiplayer.broadcast_level_up(session["username"], 2, "descubrió la contraseña de Leo y entró al Salón Real (Nivel 2)")
+        elif req.level == 2:
+            await multiplayer.broadcast_level_up(session["username"], 3, "descubrió la melodía secreta y entró al Patio del Monje (Nivel 3)")
+            
         return {
             "correct": True,
             "message": "¡Contraseña correcta! Has desbloqueado el siguiente nivel.",

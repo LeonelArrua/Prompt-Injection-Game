@@ -15,7 +15,8 @@ def create_session(username: str) -> str:
         "chat_history_per_npc": {
             1: [],
             2: [],
-            3: []
+            3: [],
+            4: []
         }
     }
     return session_id
@@ -34,6 +35,8 @@ def update_level(session_id: str, level: int):
 def add_chat_message(session_id: str, npc: int, role: str, content: str):
     """Agrega un mensaje al historial de chat con un NPC específico."""
     if session_id in sessions:
+        if npc not in sessions[session_id]["chat_history_per_npc"]:
+            sessions[session_id]["chat_history_per_npc"][npc] = []
         sessions[session_id]["chat_history_per_npc"][npc].append({"role": role, "content": content})
 
 def get_chat_history(session_id: str, npc: int) -> list:
