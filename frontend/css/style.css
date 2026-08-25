@@ -538,6 +538,58 @@ body {
     font-size: 7px;
 }
 
+.victory-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.btn-victory-dashboard {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    padding: 12px 18px;
+    background: #4a3310;
+    border: 2px solid #ffd700;
+    color: #ffd700;
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-victory-dashboard:hover {
+    background: #6e4c17;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+    transform: translateY(-2px);
+}
+
+.btn-victory-restart {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    padding: 12px 18px;
+    background: #20132b;
+    border: 2px solid #a855f7;
+    color: #e9d5ff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-victory-restart:hover {
+    background: #391c52;
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+    transform: translateY(-2px);
+}
+
 /* --- Notification toast --- */
 .toast {
     position: fixed;

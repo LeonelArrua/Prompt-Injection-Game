@@ -31,9 +31,10 @@ class BootScene extends Phaser.Scene {
             align: 'center'
         }).setOrigin(0.5);
 
-        // Transicionar después de un breve delay
+        // Transicionar a la escena correspondiente al nivel del jugador
         this.time.delayedCall(800, () => {
-            this.scene.start('GateScene');
+            const nextScene = window.targetScene || 'GateScene';
+            this.scene.start(nextScene);
         });
     }
 }

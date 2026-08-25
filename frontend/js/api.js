@@ -9,12 +9,21 @@ const API = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, character })
         });
-        return await res.json();
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.detail || 'Error al iniciar sesión');
+        }
+        return data;
     },
 
     async getSession(sessionId) {
-        const res = await fetch(`${this.baseUrl}/api/session/${sessionId}`);
-        return await res.json();
+        try {
+            const res = await fetch(`${this.baseUrl}/api/session/${sessionId}`);
+            if (!res.ok) return null;
+            return await res.json();
+        } catch (e) {
+            return null;
+        }
     },
 
     async sendChat(sessionId, message, npcLevel) {

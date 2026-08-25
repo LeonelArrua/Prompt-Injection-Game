@@ -42,6 +42,14 @@ def get_session(session_id: str) -> Dict[str, Any] | None:
     """Obtiene los datos de una sesión existente."""
     return sessions.get(session_id)
 
+def find_session_by_username(username: str) -> tuple[str, Dict[str, Any]] | None:
+    """Busca si existe una sesión previa con ese nombre de usuario (case-insensitive)."""
+    clean_name = username.strip().lower()
+    for sid, sess in sessions.items():
+        if sess.get("username", "").strip().lower() == clean_name:
+            return sid, sess
+    return None
+
 def update_level(session_id: str, level: int):
     """Actualiza el nivel actual del jugador y lo desbloquea."""
     if session_id in sessions:

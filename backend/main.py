@@ -10,7 +10,7 @@ import asyncio
 import logging
 
 from session_manager import (
-    create_session, get_session, update_level,
+    create_session, get_session, find_session_by_username, update_level,
     add_chat_message, get_chat_history, get_dashboard_data, sessions
 )
 from game_logic import verify_password, check_jailbreak, check_dragon_calmed, NPC_NAMES
@@ -68,9 +68,20 @@ class InjectMessageRequest(BaseModel):
 
 @app.post("/api/session")
 async def start_session(req: SessionRequest):
-    """Crea una nueva sesión de juego para un usuario."""
+    """Crea una nueva sesión de juego asegurando que el nombre no esté repetido."""
     char = getattr(req, "character", "player_warrior") or "player_warrior"
-    session_id = create_session(req.username, char)
+    username = req.username.strip()
+    
+    # Validar que el nombre no esté ya registrado por ningún jugador
+    existing = find_session_by_username(username)
+    if existing:
+        raise HTTPException(
+            status_code=409, 
+            detail=f"El nombre '{username}' ya está en uso en el Reino. Por favor elige otro nombre."
+        )
+
+    # Crear nueva sesión única
+    session_id = create_session(username, char)
     session = get_session(session_id)
     return {
         "session_id": session_id,
@@ -85,7 +96,9 @@ async def get_session_info(session_id: str):
     session = get_session(session_id)
     if not session:
         raise HTTPException(status_code=404, detail="Sesión no encontrada")
-    return session
+    data = dict(session)
+    data["session_id"] = session_id
+    return data
 
 @app.post("/api/chat/{session_id}")
 async def chat(session_id: str, req: ChatRequest):
