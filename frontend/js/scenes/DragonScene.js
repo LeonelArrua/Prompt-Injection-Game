@@ -11,6 +11,7 @@ class DragonScene extends Phaser.Scene {
         const MAP_H = 20;
 
         window.currentActiveLevel = 4;
+        if (window.questManager) questManager.setLevel(4);
         document.getElementById('hud-level').textContent = '📍 Nivel 4 — Campo de Batalla del Dragón';
         const pregBtn = document.getElementById('toggle-announcements-btn');
         if (pregBtn) pregBtn.style.display = 'none';
@@ -109,11 +110,10 @@ class DragonScene extends Phaser.Scene {
         this.general.body.setOffset(3, 8);
 
         this.add.text(14.5 * TILE + 8, 12 * TILE + 2, '⚔️ Mariscal Martin B.', {
-            fontSize: '5px',
-            fontFamily: '"Press Start 2P"',
-            color: '#ef4444',
-            stroke: '#000000',
-            strokeThickness: 2,
+            fontSize: '6px',
+            fontFamily: '"Press Start 2P", monospace',
+            color: '#f87171',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true },
             align: 'center'
         }).setOrigin(0.5);
 
@@ -154,10 +154,9 @@ class DragonScene extends Phaser.Scene {
 
         this.add.text(15 * TILE, 0.8 * TILE + 4, '🐉 Ignis el Dragón Esmeralda', {
             fontSize: '6px',
-            fontFamily: '"Press Start 2P"',
+            fontFamily: '"Press Start 2P", monospace',
             color: '#ffd700',
-            stroke: '#000000',
-            strokeThickness: 2,
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true },
             align: 'center'
         }).setOrigin(0.5);
 
@@ -200,14 +199,7 @@ class DragonScene extends Phaser.Scene {
 
         showToast('🔥 ¡Has entrado al Campo de Batalla del Dragón!', 'error');
 
-        this.add.text(15 * TILE, (MAP_H - 1) * TILE - 2, '¡Habla con el Dragón y cálmalo con tu ingenio!', {
-            fontSize: '5px',
-            fontFamily: '"Press Start 2P"',
-            color: '#ffd700',
-            stroke: '#000000',
-            strokeThickness: 2,
-            align: 'center'
-        }).setOrigin(0.5);
+
     }
 
     update() {

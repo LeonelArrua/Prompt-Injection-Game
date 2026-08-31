@@ -11,6 +11,7 @@ class CourtyardScene extends Phaser.Scene {
         const MAP_H = 20;
 
         window.currentActiveLevel = 3;
+        if (window.questManager) questManager.setLevel(3);
         document.getElementById('hud-level').textContent = '📍 Nivel 3 — Patio de la Abadía';
         const pregBtn = document.getElementById('toggle-announcements-btn');
         if (pregBtn) pregBtn.style.display = 'none';
@@ -58,11 +59,10 @@ class CourtyardScene extends Phaser.Scene {
         this.church.body.setOffset(4, 28);
 
         this.add.text(23 * TILE, 1 * TILE + 2, '⛪ Abadía Sagrada', {
-            fontSize: '5px',
-            fontFamily: '"Press Start 2P"',
+            fontSize: '6px',
+            fontFamily: '"Press Start 2P", monospace',
             color: '#ffd700',
-            stroke: '#000000',
-            strokeThickness: 2,
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true },
             align: 'center'
         }).setOrigin(0.5);
 
@@ -89,11 +89,10 @@ class CourtyardScene extends Phaser.Scene {
         this.bubble.setVisible(false);
 
         this.add.text(22 * TILE + 8, 7.2 * TILE, '📿 Fray Tomás', {
-            fontSize: '5px',
-            fontFamily: '"Press Start 2P"',
-            color: '#10b981',
-            stroke: '#000000',
-            strokeThickness: 2,
+            fontSize: '6px',
+            fontFamily: '"Press Start 2P", monospace',
+            color: '#86efac',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true },
             align: 'center'
         }).setOrigin(0.5);
 
@@ -117,50 +116,46 @@ class CourtyardScene extends Phaser.Scene {
 
         // Etiqueta abajo del caniche para no tapar a Fray Tomás
         this.add.text(24 * TILE, 10.4 * TILE, '🐩 Sr. Caniche', {
-            fontSize: '4.5px',
-            fontFamily: '"Press Start 2P"',
-            color: '#f8fafc',
-            stroke: '#000000',
-            strokeThickness: 2,
+            fontSize: '6px',
+            fontFamily: '"Press Start 2P", monospace',
+            color: '#fed7aa',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true },
             align: 'center'
         }).setOrigin(0.5);
 
         // --- 6. FUENTE CENTRAL CON ONDAS ---
         this.add.image(14 * TILE + 8, 13 * TILE, 'shadow').setScale(1.8, 1);
-        this.fountain = this.physics.add.staticImage(14 * TILE + 8, 12 * TILE + 8, 'fountain');
+        this.fountain = this.physics.add.staticImage(14 * TILE + 8, 12 * TILE, 'fountain');
         this.fountain.setImmovable(true);
         this.fountain.body.setSize(28, 20);
-        this.fountain.body.setOffset(2, 8);
+        this.fountain.body.setOffset(2, 6);
 
-        const waterGlow = this.add.circle(14 * TILE + 8, 12 * TILE + 4, 12, 0x38bdf8, 0.3);
+        // Ondas de agua en la fuente
+        const waterRipples = this.add.ellipse(14 * TILE + 8, 12 * TILE + 4, 18, 8, 0x60a5fa, 0.3);
         this.tweens.add({
-            targets: waterGlow,
-            alpha: { from: 0.15, to: 0.45 },
-            scaleX: { from: 0.85, to: 1.25 },
-            scaleY: { from: 0.85, to: 1.25 },
+            targets: waterRipples,
+            scaleX: { from: 0.8, to: 1.15 },
+            scaleY: { from: 0.8, to: 1.15 },
+            alpha: { from: 0.4, to: 0.1 },
             duration: 1000,
             yoyo: true,
             repeat: -1
         });
 
-        // --- 7. EJÉRCITO DE INFANTERÍA EN FORMACIÓN (Flanco Izquierdo) ---
+        // --- 7. EJÉRCITO REAL ACAMPADO ---
         this.army = this.physics.add.staticGroup();
-        const armyPositions = [
-            [3, 5], [5, 5], [7, 5],
-            [3, 8], [5, 8], [7, 8],
-            [3, 11], [5, 11], [7, 11]
+        const soldierPositions = [
+            [3, 4], [4, 4], [6, 4], [7, 4],
+            [3, 6], [4, 6], [6, 6], [7, 6],
+            [3, 8], [4, 8], [6, 8], [7, 8]
         ];
-        armyPositions.forEach(([sx, sy]) => {
-            this.add.image(sx * TILE + 8, sy * TILE + 12, 'shadow').setScale(0.9, 0.6);
-            const soldier = this.army.create(sx * TILE + 8, sy * TILE + 8, 'soldier');
+        soldierPositions.forEach(([sx, sy]) => {
+            this.add.image(sx * TILE + 8, sy * TILE + 10, 'shadow').setScale(0.8, 0.5);
+            const soldier = this.army.create(sx * TILE + 8, sy * TILE + 4, 'soldier');
             soldier.setImmovable(true);
-            soldier.body.setSize(14, 14);
+            soldier.body.setSize(12, 12);
             soldier.body.setOffset(2, 4);
         });
-
-        // Armerías y barriles del campamento
-        this.add.image(9 * TILE + 4, 6 * TILE, 'weapon_rack');
-        this.add.image(9 * TILE + 4, 10 * TILE, 'weapon_rack');
 
         // --- 8. GRAN MARISCAL CANOSO (Comandante en Jefe) ---
         this.generalShadow = this.add.image(5 * TILE + 8, 3 * TILE + 12, 'shadow').setScale(1.1, 0.7);
@@ -170,11 +165,10 @@ class CourtyardScene extends Phaser.Scene {
         this.general.body.setOffset(3, 8);
 
         this.add.text(5 * TILE + 8, 2 * TILE + 2, '⚔️ Mariscal Martin B.', {
-            fontSize: '5px',
-            fontFamily: '"Press Start 2P"',
-            color: '#ef4444',
-            stroke: '#000000',
-            strokeThickness: 2,
+            fontSize: '6px',
+            fontFamily: '"Press Start 2P", monospace',
+            color: '#f87171',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true },
             align: 'center'
         }).setOrigin(0.5);
 
@@ -234,14 +228,7 @@ class CourtyardScene extends Phaser.Scene {
 
         showToast('📿 Has llegado al Patio de la Abadía', 'success');
 
-        this.add.text(14 * TILE + 8, (MAP_H - 1) * TILE - 2, 'Hacé que Tomás hable del Hacking Day', {
-            fontSize: '5px',
-            fontFamily: '"Press Start 2P"',
-            color: '#ffd700',
-            stroke: '#000000',
-            strokeThickness: 2,
-            align: 'center'
-        }).setOrigin(0.5);
+
     }
 
     update() {

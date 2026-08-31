@@ -11,9 +11,15 @@ class HallScene extends Phaser.Scene {
         const MAP_H = 20;
 
         window.currentActiveLevel = 2;
+        if (window.questManager) questManager.setLevel(2);
         document.getElementById('hud-level').textContent = '📍 Nivel 2 — Salón del Trono Real';
         const pregBtn = document.getElementById('toggle-announcements-btn');
         if (pregBtn) pregBtn.style.display = 'inline-block';
+
+        // Abrir Pregón Real automáticamente al entrar al Nivel 2 y auto-cerrar tras 7s
+        if (typeof openAnnouncements === 'function') {
+            openAnnouncements(7);
+        }
 
         // --- 1. Suelo de baldosas de piedra pulida ---
         for (let y = 0; y < MAP_H; y++) {
@@ -113,11 +119,10 @@ class HallScene extends Phaser.Scene {
         this.king.body.setOffset(1, 6);
 
         this.add.text(14.5 * TILE + 8, 2 * TILE + 4, '👑 El Rey de Paraná', {
-            fontSize: '5px',
-            fontFamily: '"Press Start 2P"',
+            fontSize: '6px',
+            fontFamily: '"Press Start 2P", monospace',
             color: '#ffd700',
-            stroke: '#000000',
-            strokeThickness: 2,
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true },
             align: 'center'
         }).setOrigin(0.5);
 
@@ -132,11 +137,10 @@ class HallScene extends Phaser.Scene {
         this.bubble.setVisible(false);
 
         this.add.text(19 * TILE + 8, 8 * TILE - 14, '🎵 Juan el Trovador', {
-            fontSize: '5px',
-            fontFamily: '"Press Start 2P"',
+            fontSize: '6px',
+            fontFamily: '"Press Start 2P", monospace',
             color: '#ffd700',
-            stroke: '#000000',
-            strokeThickness: 2,
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true },
             align: 'center'
         }).setOrigin(0.5);
 

@@ -442,6 +442,45 @@
             transition: width 0.3s ease;
         }
 
+        .time-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .time-badge {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 9px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .time-badge.success {
+            background: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            text-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
+        }
+
+        .time-badge.in-progress {
+            background: rgba(56, 189, 248, 0.1);
+            color: #7dd3fc;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        .time-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.2px;
+        }
+
+        .kpi-card.speedrun { --card-accent: #f59e0b; }
+        .kpi-card.speedrun .kpi-value { color: #fbbf24; font-size: 18px; }
+
         .empty-state {
             text-align: center;
             padding: 40px;
@@ -505,6 +544,15 @@
             <div class="kpi-value" id="kpi-victories">0</div>
             <div class="kpi-subtitle">Han salvado al Reino del Paraná</div>
         </div>
+
+        <div class="kpi-card speedrun">
+            <div class="kpi-top">
+                <span class="kpi-title">Récord Speedrun</span>
+                <span class="kpi-icon">⚡</span>
+            </div>
+            <div class="kpi-value" id="kpi-speedrun">--:--</div>
+            <div class="kpi-subtitle" id="kpi-speedrun-sub">Mejor tiempo registrado</div>
+        </div>
     </div>
 
     <div class="distribution-section">
@@ -555,12 +603,13 @@
                         <th>Nivel Actual</th>
                         <th>Prompts Tirados</th>
                         <th>Progreso</th>
+                        <th>⏱️ Cronometraje</th>
                         <th>Última Actividad</th>
                     </tr>
                 </thead>
                 <tbody id="players-table-body">
                     <tr>
-                        <td colspan="6" class="empty-state">⏳ Cargando datos de jugadores...</td>
+                        <td colspan="7" class="empty-state">⏳ Cargando datos de jugadores...</td>
                     </tr>
                 </tbody>
             </table>
@@ -610,6 +659,14 @@
             document.getElementById('kpi-total-prompts').textContent = stats.total_prompts || 0;
             document.getElementById('kpi-victories').textContent = stats.total_victories || 0;
 
+            if (stats.best_time_formatted) {
+                document.getElementById('kpi-speedrun').textContent = `⚡ ${stats.best_time_formatted}`;
+                document.getElementById('kpi-speedrun-sub').textContent = `Por ${stats.best_time_player || 'Anónimo'}`;
+            } else {
+                document.getElementById('kpi-speedrun').textContent = '--:--';
+                document.getElementById('kpi-speedrun-sub').textContent = 'Esperando primer campeón';
+            }
+
             const breakdown = stats.levels_breakdown || {};
             document.getElementById('pill-lvl-1').textContent = breakdown.level_1 || 0;
             document.getElementById('pill-lvl-2').textContent = breakdown.level_2 || 0;
@@ -634,7 +691,7 @@
             if (!players || players.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="empty-state">
+                        <td colspan="7" class="empty-state">
                             🍃 No hay aventureros registrados todavía.<br>
                             <span style="font-size: 11px; opacity: 0.7;">Los jugadores aparecerán tan pronto ingresen al juego.</span>
                         </td>
@@ -653,6 +710,16 @@
                 const statusBadge = p.is_online
                     ? `<span class="status-badge online"><span class="live-dot" style="width:6px; height:6px;"></span> Online</span>`
                     : `<span class="status-badge offline">⚪ Desconectado</span>`;
+
+                const timeCellHtml = p.finished_at
+                    ? `<div class="time-cell">
+                           <span class="time-badge success">⚡ ${escapeHtml(p.total_time_formatted || 'Completado')}</span>
+                           <span class="time-sub">🟢 ${p.created_at} ➔ 🏁 ${p.finished_at}</span>
+                       </div>`
+                    : `<div class="time-cell">
+                           <span class="time-badge in-progress">⏳ En juego</span>
+                           <span class="time-sub">🟢 Inicio: ${p.created_at}</span>
+                       </div>`;
 
                 html += `
                     <tr>
@@ -685,6 +752,7 @@
                                 <span style="font-size: 11px; font-weight: 700; color: ${lvlInfo.color};">${lvlInfo.progress}</span>
                             </div>
                         </td>
+                        <td>${timeCellHtml}</td>
                         <td>
                             <span style="font-size: 12px; color: var(--text-muted);">${p.last_active}</span>
                         </td>

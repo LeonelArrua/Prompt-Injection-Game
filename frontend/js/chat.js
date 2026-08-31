@@ -182,6 +182,8 @@ class ChatManager {
 
                     const goToDragon = () => {
                         this.hide();
+                        window.currentActiveLevel = 4;
+                        if (window.questManager) window.questManager.setLevel(4);
                         if (window.gameInstance) {
                             const activeScenes = window.gameInstance.scene.getScenes(true);
                             activeScenes.forEach(s => s.scene.stop());
@@ -312,6 +314,10 @@ class ChatManager {
                 this.hide();
 
                 // Transicionar a la siguiente escena usando el next_level devuelto por el backend
+                if (result.next_level) {
+                    window.currentActiveLevel = result.next_level;
+                    if (window.questManager) window.questManager.setLevel(result.next_level);
+                }
                 const nextSceneName = result.next_level === 2 ? 'HallScene' : (result.next_level === 3 ? 'CourtyardScene' : null);
                 if (nextSceneName && window.gameInstance) {
                     setTimeout(() => {

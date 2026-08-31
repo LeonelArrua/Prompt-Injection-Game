@@ -16,7 +16,7 @@ function selectCharacter(charKey) {
     });
 }
 
-// Configuración de Phaser
+// Configuración de Phaser con Escalamiento Responsivo
 const gameConfig = {
     type: Phaser.AUTO,
     width: 480,   // 30 tiles * 16px
@@ -26,7 +26,13 @@ const gameConfig = {
         antialias: false,
         roundPixels: true
     },
-    zoom: 2,
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        parent: 'game-container',
+        width: 480,
+        height: 320
+    },
     parent: 'game-container',
     backgroundColor: '#1a1a2e',
     physics: {
@@ -83,10 +89,11 @@ async function startGame(existingSession = null) {
 
         // Actualizar HUD
         document.getElementById('hud-player').textContent = `👤 ${session.username}`;
+        if (window.questManager) questManager.setLevel(session.current_level || 1);
         
         // Ocultar login, mostrar juego
         document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('game-container').style.display = 'block';
+        document.getElementById('game-container').style.display = 'flex';
         document.getElementById('hud').style.display = 'flex';
 
         // Iniciar Phaser si no está iniciado

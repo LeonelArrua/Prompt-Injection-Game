@@ -18,16 +18,18 @@ class BootScene extends Phaser.Scene {
         const cy = this.cameras.main.height / 2;
         
         this.add.text(cx, cy - 20, '🏰 Preparando el Reino...', {
-            fontSize: '10px',
-            fontFamily: '"Press Start 2P"',
-            color: '#c8a84e',
+            fontSize: '7px',
+            fontFamily: '"Press Start 2P", monospace',
+            color: '#ffd700',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true },
             align: 'center'
         }).setOrigin(0.5);
 
         this.add.text(cx, cy + 10, 'Cargando sprites...', {
-            fontSize: '7px',
-            fontFamily: '"Press Start 2P"',
-            color: '#8a7a5a',
+            fontSize: '6px',
+            fontFamily: '"Press Start 2P", monospace',
+            color: '#c8a84e',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true },
             align: 'center'
         }).setOrigin(0.5);
 

@@ -28,7 +28,16 @@ class TelegramService:
     def __init__(self):
         self._cache = list(MOCK_MESSAGES)
         self._last_offset = 0
-        self._announcements_history = []  # Lista de {id, sender, text, raw_telegram, timestamp}
+        self._announcements_history = [
+            {
+                "sender": "🎵 Juan el Trovador",
+                "first_name": "El Heraldo Real",
+                "header": "Pergamino del Rey",
+                "text": "¡Oíd las noticias que llegan al castillo del Paraná! 🎵 / ¡El rey ha ordenado un torneo para quien demuestre su gran ingenio! 🪕",
+                "raw_telegram": "El rey ha declarado un nuevo torneo de justas para la próxima luna llena.",
+                "source": "Reino"
+            }
+        ]
         self._is_running = False
         self._ai_service = None
         self._multiplayer = None
@@ -67,7 +76,8 @@ class TelegramService:
             song_response = await self._ai_service.chat(
                 system_prompt=prompt,
                 messages=[{"role": "user", "content": f"Llegó esta noticia del reino enviada por {sender_name}: '{message_text}'. ¡Cántala o proclámala a la corte!"}],
-                temperature=0.7
+                temperature=0.7,
+                num_predict=220
             )
         except Exception as e:
             logger.error(f"Error generando copla de Juan: {e}")

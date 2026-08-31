@@ -9,14 +9,15 @@
 }
 
 body {
-    background: #1a1a2e;
+    background: #141020;
     font-family: 'Press Start 2P', monospace;
     overflow: hidden;
     width: 100vw;
     height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
 }
 
 /* --- Login Screen --- */
@@ -164,36 +165,23 @@ body {
     margin-top: 20px;
 }
 
-/* --- Game Container --- */
-#game-container {
-    position: relative;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.85);
-    border-radius: 4px;
-}
-
-#game-container canvas {
-    image-rendering: -moz-crisp-edges;
-    image-rendering: -webkit-crisp-edges;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    border: 4px solid #b89700;
-    border-radius: 4px;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.7);
-}
-
-/* --- HUD --- */
+/* --- HUD Superior / Barra de Estado del Reino --- */
 #hud {
-    position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(42, 26, 10, 0.9);
-    border: 2px solid #c8a84e;
-    padding: 8px 20px;
+    position: relative;
+    width: 100%;
+    height: 40px;
+    min-height: 40px;
+    background: linear-gradient(180deg, #2a1a0a 0%, #1a0f05 100%);
+    border-bottom: 3px solid #c8a84e;
+    padding: 0 20px;
     display: flex;
-    gap: 30px;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
     z-index: 100;
-    border-radius: 2px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.85);
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 #hud span {
@@ -202,39 +190,113 @@ body {
     white-space: nowrap;
 }
 
+.hud-divider {
+    color: #5c4323 !important;
+    font-size: 10px !important;
+}
+
 #hud-hint {
-    color: #8a7a5a;
+    color: #a89474;
+    font-size: 7px;
 }
 
 #toggle-announcements-btn {
     font-family: 'Press Start 2P', monospace;
     font-size: 7px;
-    padding: 3px 8px;
+    padding: 5px 10px;
     background: #3a2211;
     border: 1px solid #c8a84e;
     color: #ffd700;
     cursor: pointer;
-    border-radius: 2px;
+    border-radius: 4px;
 }
 
 #toggle-announcements-btn:hover {
     background: #5a3518;
 }
 
+/* --- Botón Quest en HUD --- */
+#btn-quest-log {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    padding: 5px 10px;
+    background: #3d260c;
+    border: 1px solid #eab308;
+    color: #fef08a;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+#btn-quest-log:hover {
+    background: #5e3b12;
+    box-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
+}
+
+.quest-pulse {
+    animation: questPulseAnim 1.5s infinite alternate;
+}
+
+/* --- Game Container --- */
+#game-container {
+    position: relative;
+    flex: 1;
+    width: 100vw;
+    height: calc(100vh - 40px);
+    max-width: 100vw;
+    max-height: calc(100vh - 40px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+#game-container canvas {
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    border: 3px solid #b89700;
+    border-radius: 4px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
+    max-width: calc(100vw - 16px);
+    max-height: calc(100vh - 54px);
+    object-fit: contain;
+}
+
+@keyframes questPulseAnim {
+    from {
+        box-shadow: 0 0 4px #eab308;
+        transform: scale(1);
+    }
+    to {
+        box-shadow: 0 0 14px #eab308, 0 0 20px #ca8a04;
+        transform: scale(1.06);
+    }
+}
+
 /* --- Panel de Pregón Real (Noticias en Vivo) --- */
 #announcements-panel {
     position: fixed;
     left: 20px;
-    top: 55px;
-    width: 320px;
-    max-height: 240px;
-    background: rgba(30, 18, 8, 0.95);
+    top: 50px;
+    width: 330px;
+    height: 240px;
+    max-height: 45vh;
+    background: rgba(28, 16, 6, 0.96);
     border: 2px solid #c8a84e;
     border-radius: 4px;
     display: flex;
     flex-direction: column;
     z-index: 150;
-    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.85);
+    animation: panelFadeSlide 0.25s ease-out;
+}
+
+@keyframes panelFadeSlide {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 #announcements-header {
@@ -246,33 +308,51 @@ body {
     border-bottom: 1px solid #c8a84e;
     color: #ffd700;
     font-size: 7px;
+    flex-shrink: 0;
 }
 
 #announcements-header button {
-    background: none;
+    background: #2a1505;
     border: 1px solid #8a5a3a;
-    color: #e8d5a3;
+    color: #ffd700;
     font-size: 8px;
     cursor: pointer;
-    padding: 1px 6px;
+    padding: 2px 6px;
+    border-radius: 2px;
     font-family: 'Press Start 2P', monospace;
+    transition: background 0.15s;
+}
+
+#announcements-header button:hover {
+    background: #5a2e0a;
+    color: #ffffff;
 }
 
 #announcements-list {
     flex: 1;
     overflow-y: auto;
-    padding: 8px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    scroll-behavior: smooth;
 }
 
 #announcements-list::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
+}
+
+#announcements-list::-webkit-scrollbar-track {
+    background: #140b03;
 }
 
 #announcements-list::-webkit-scrollbar-thumb {
-    background: #6b5a3a;
+    background: #c8a84e;
+    border-radius: 3px;
+}
+
+#announcements-list::-webkit-scrollbar-thumb:hover {
+    background: #ffd700;
 }
 
 .announcement-item {
@@ -311,14 +391,16 @@ body {
     top: 50%;
     transform: translateY(-50%);
     width: 380px;
+    max-width: calc(100vw - 40px);
     height: 500px;
-    background: rgba(42, 26, 10, 0.95);
+    max-height: 85vh;
+    background: rgba(42, 26, 10, 0.96);
     border: 3px solid #c8a84e;
     border-radius: 4px;
     display: flex;
     flex-direction: column;
     z-index: 200;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.85);
 }
 
 #chat-header {
@@ -626,6 +708,212 @@ body {
     to { opacity: 0; }
 }
 
+/* --- Modal Pergamino de Misión / Quest Log --- */
+#quest-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 6, 3, 0.85);
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 550;
+    animation: fadeInModal 0.2s ease-out;
+}
+
+#quest-parchment {
+    background: #241407;
+    border: 3px solid #c8a84e;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(70, 40, 15, 0.6);
+    max-width: 580px;
+    width: 90%;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 4px;
+    animation: questAppear 0.25s ease-out;
+}
+
+@keyframes questAppear {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+#quest-header {
+    background: #3d210b;
+    padding: 12px 16px;
+    border-bottom: 2px solid #8a6a2a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.quest-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quest-seal {
+    font-size: 16px;
+}
+
+#quest-title {
+    color: #ffd700;
+    font-size: 9px;
+    font-family: 'Press Start 2P', monospace;
+    line-height: 1.4;
+}
+
+#quest-close {
+    background: none;
+    border: 1px solid #8a5a3a;
+    color: #e8d5a3;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 2px 7px;
+    font-family: 'Press Start 2P', monospace;
+    border-radius: 2px;
+}
+
+#quest-close:hover {
+    background: #8a3a3a;
+    color: #ffffff;
+}
+
+.quest-tech-badge {
+    background: #170d05;
+    color: #38bdf8;
+    font-size: 7px;
+    font-family: 'Press Start 2P', monospace;
+    padding: 6px 16px;
+    border-bottom: 1px dashed #6b5025;
+}
+
+#quest-body {
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    color: #e8d5a3;
+}
+
+#quest-body::-webkit-scrollbar {
+    width: 5px;
+}
+
+#quest-body::-webkit-scrollbar-thumb {
+    background: #8a6a2a;
+    border-radius: 3px;
+}
+
+.quest-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.quest-section-label {
+    font-size: 7px;
+    font-family: 'Press Start 2P', monospace;
+    color: #c8a84e;
+    letter-spacing: 0.5px;
+}
+
+.quest-text-highlight {
+    font-size: 8px;
+    line-height: 1.5;
+    color: #fef08a;
+    background: rgba(0, 0, 0, 0.35);
+    padding: 8px 10px;
+    border-left: 3px solid #eab308;
+    border-radius: 2px;
+}
+
+.quest-steps-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.quest-step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 6px 8px;
+    border-radius: 2px;
+}
+
+.quest-step-num {
+    background: #8a6a2a;
+    color: #ffffff;
+    font-size: 7px;
+    font-family: 'Press Start 2P', monospace;
+    padding: 2px 5px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.quest-step-text {
+    font-size: 8px;
+    line-height: 1.5;
+    color: #e2e8f0;
+}
+
+.quest-tip-box {
+    background: #142318;
+    border: 1px solid #22c55e;
+    padding: 10px;
+    border-radius: 3px;
+}
+
+.quest-tip-header {
+    font-size: 7px;
+    font-family: 'Press Start 2P', monospace;
+    color: #86efac;
+    margin-bottom: 6px;
+}
+
+.quest-tip-content {
+    font-size: 7.5px;
+    line-height: 1.5;
+    color: #bbf7d0;
+}
+
+#quest-footer {
+    background: #1c0e04;
+    padding: 10px 16px;
+    border-top: 1px solid #5a3c18;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-quest-ok {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    padding: 8px 14px;
+    background: #4a2810;
+    border: 1px solid #eab308;
+    color: #fef08a;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+}
+
+.btn-quest-ok:hover {
+    background: #713f1a;
+    box-shadow: 0 0 10px rgba(234, 179, 8, 0.4);
+}
+
 /* --- Modal Medieval de Contraseña --- */
 #password-modal {
     position: fixed;
@@ -833,4 +1121,62 @@ body {
 .global-feed-item .feed-body strong {
     color: #ffffff;
     text-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+}
+
+/* --- Responsive Media Queries --- */
+@media (max-width: 768px) {
+    #hud {
+        height: auto;
+        min-height: 36px;
+        padding: 4px 8px;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+    }
+    
+    .hud-group {
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    #hud span {
+        font-size: 6px;
+    }
+
+    #btn-quest-log, #toggle-announcements-btn {
+        font-size: 6px;
+        padding: 3px 6px;
+    }
+    
+    #game-container {
+        height: calc(100vh - 48px);
+        max-height: calc(100vh - 48px);
+    }
+
+    #chat-container {
+        right: 10px;
+        left: 10px;
+        width: auto;
+        transform: translateY(-50%);
+        max-height: 75vh;
+    }
+
+    #announcements-panel {
+        left: 10px;
+        top: 50px;
+        width: 280px;
+        max-width: 90vw;
+    }
+
+    #global-chat-feed {
+        left: 10px;
+        bottom: 10px;
+        width: 280px;
+        max-width: 90vw;
+    }
+    
+    #quest-parchment {
+        width: 95%;
+        max-height: 92vh;
+    }
 }

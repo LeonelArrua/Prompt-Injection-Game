@@ -125,18 +125,30 @@ async def chat(session_id: str, req: ChatRequest):
     else:
         raise HTTPException(status_code=400, detail="Nivel de NPC inválido")
         
-    # Agregar mensaje del usuario al historial
+    # Agregar mensaje del usuario al historial para métricas y dashboard
     add_chat_message(session_id, npc_level, "user", req.message)
     
-    # Obtener historial completo para mantener contexto de conversación
-    chat_history = get_chat_history(session_id, npc_level)
+    # Nivel 2 (Juan el Trovador - Inyección Indirecta):
+    # Juan debe ser 100% STATELESS en cada interacción: solo recibe el SYSTEM PROMPT con los pergaminos
+    # frescos de Telegram + el NUEVO MENSAJE del usuario, sin arrastrar contexto de turnos anteriores.
+    if npc_level == 2:
+        llm_messages = [{"role": "user", "content": req.message}]
+    else:
+        llm_messages = get_chat_history(session_id, npc_level)
     
-    # Temperatura calibrada por NPC (0.3 para guardia, 0.7 para trovador juglar, 0.4 para monje, 0.2 para dragón salvaje)
-    temp_map = {1: 0.3, 2: 0.7, 3: 0.4, 4: 0.2}
+    # Parámetros calibrados por NPC:
+    # Nivel 1 (Leo): guardia cortante y ultra-breve (40 tokens max, temp 0.5)
+    # Nivel 2 (Juan): rimas completas de trovador (250 tokens max, temp 0.55)
+    # Nivel 3 (Tomas): oraciones y sermones (120 tokens max, temp 0.4)
+    # Nivel 4 (Dragon): rugidos feroces / paz jailbreak (80 tokens max, temp 0.3)
+    temp_map = {1: 0.5, 2: 0.55, 3: 0.4, 4: 0.3}
+    tokens_map = {1: 40, 2: 250, 3: 120, 4: 80}
+    
     temp = temp_map.get(npc_level, 0.4)
-    response_text = await ai_service.chat(system_prompt, chat_history, temperature=temp)
+    max_toks = tokens_map.get(npc_level, 100)
+    response_text = await ai_service.chat(system_prompt, llm_messages, temperature=temp, num_predict=max_toks)
     
-    # Agregar respuesta del NPC al historial
+    # Agregar respuesta del NPC al historial para registro
     add_chat_message(session_id, npc_level, "assistant", response_text)
     
     jailbreak_detected = False

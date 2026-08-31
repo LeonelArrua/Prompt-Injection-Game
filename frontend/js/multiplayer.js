@@ -10,6 +10,8 @@ class MultiplayerClient {
         this.lastSendTime = 0;
         this.currentScene = null;
         this.onlineCount = 0;
+        this.lastAnnouncementsHash = '';
+        this.pollInterval = null;
     }
 
     connect(sessionId) {
@@ -21,6 +23,16 @@ class MultiplayerClient {
         } catch (e) {
             console.warn('No se pudo conectar WebSocket multiplayer:', e);
             return;
+        }
+
+        // Sondeo en vivo periódico cada 2.5s para mantener el Pregón Real 100% fresco sin recargar
+        if (!this.pollInterval) {
+            this.pollInterval = setInterval(() => {
+                const panel = document.getElementById('announcements-panel');
+                if ((panel && panel.style.display !== 'none') || window.currentActiveLevel === 2) {
+                    this.loadInitialAnnouncements();
+                }
+            }, 2500);
         }
 
         this.ws.onopen = () => {
@@ -155,7 +167,9 @@ class MultiplayerClient {
                 ${rawNote}
             `;
             list.appendChild(item);
-            list.scrollTop = list.scrollHeight;
+            setTimeout(() => {
+                list.scrollTop = list.scrollHeight;
+            }, 50);
         }
 
         // Los avisos en vivo, chat global flotante y toast del trovador SOLO se muestran en el Nivel 2
@@ -190,35 +204,54 @@ class MultiplayerClient {
         // 2. Notificación toast destacada en Nivel 2
         showToast(`📜 ${headerText}`, 'success');
 
-        // Si el panel de anuncios estaba oculto en Nivel 2, abrirlo suavemente
-        const panel = document.getElementById('announcements-panel');
-        if (panel && panel.style.display === 'none') {
-            panel.style.display = 'flex';
-        }
+        // Si el panel de anuncios estaba oculto en Nivel 2, abrirlo suavemente con autocierre
+        openAnnouncements(8);
     }
 
     async loadInitialAnnouncements() {
         try {
             const res = await fetch('/api/announcements');
+            if (!res.ok) return;
             const data = await res.json();
             const list = document.getElementById('announcements-list');
-            if (list && data.announcements && data.announcements.length > 0) {
-                list.innerHTML = '';
-                data.announcements.forEach(a => {
-                    const item = document.createElement('div');
-                    item.className = 'announcement-item';
-                    const rawNote = a.raw_telegram ? `<span class="raw">Pergamino: "${a.raw_telegram}"</span>` : '';
-                    item.innerHTML = `
-                        <span class="meta">${a.sender}</span>
-                        <span class="body">${a.text}</span>
-                        ${rawNote}
-                    `;
-                    list.appendChild(item);
-                });
-                list.scrollTop = list.scrollHeight;
+            if (!list) return;
+
+            const announcements = data.announcements || [];
+            if (announcements.length === 0) return;
+
+            // Generar huella simple de los anuncios actuales
+            const newHash = announcements.map(a => `${a.header || ''}_${a.text || ''}_${a.raw_telegram || ''}`).join('||');
+            if (newHash === this.lastAnnouncementsHash && list.children.length > 0 && !list.querySelector('.system')) {
+                return; // Sin cambios, no tocar el DOM para que la lectura sea fluida
+            }
+
+            const isAtBottom = (list.scrollHeight - list.scrollTop - list.clientHeight) < 60;
+            const wasInitialState = list.children.length === 0 || list.querySelector('.system') !== null;
+
+            list.innerHTML = '';
+            announcements.forEach(a => {
+                const item = document.createElement('div');
+                item.className = 'announcement-item';
+                const headerText = a.header ? ` — ${this.escapeHtml(a.header)}` : '';
+                const rawNote = a.raw_telegram ? `<span class="raw">Pergamino: "${this.escapeHtml(a.raw_telegram)}"</span>` : '';
+                item.innerHTML = `
+                    <span class="meta">${this.escapeHtml(a.sender || '🎵 Juan el Trovador')}${headerText}</span>
+                    <span class="body">${this.escapeHtml(a.text || '')}</span>
+                    ${rawNote}
+                `;
+                list.appendChild(item);
+            });
+
+            this.lastAnnouncementsHash = newHash;
+
+            // Si es la carga inicial o el usuario estaba en el fondo, scrollear al último mensaje
+            if (wasInitialState || isAtBottom) {
+                setTimeout(() => {
+                    list.scrollTop = list.scrollHeight;
+                }, 40);
             }
         } catch (e) {
-            console.warn('No se pudieron cargar anuncios iniciales:', e);
+            console.warn('No se pudieron cargar anuncios:', e);
         }
     }
 
@@ -286,14 +319,13 @@ class MultiplayerClient {
                 sprite.setDepth(5);
                 this.sprites[id] = sprite;
 
-                // Etiqueta con nombre
+                // Etiqueta con nombre nítida
                 const label = scene.add.text(data.x, data.y - 18, data.username, {
-                    fontSize: '5px',
-                    fontFamily: '"Press Start 2P"',
+                    fontSize: '6px',
+                    fontFamily: '"Press Start 2P", monospace',
                     color: '#77bbff',
                     align: 'center',
-                    stroke: '#000000',
-                    strokeThickness: 2
+                    shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true }
                 }).setOrigin(0.5).setDepth(6);
                 this.labels[id] = label;
             } else {
@@ -336,19 +368,66 @@ class MultiplayerClient {
 // Instancia global
 const multiplayerClient = new MultiplayerClient();
 
-// Cargar anuncios tan pronto como el DOM esté listo
+let announcementsTimer = null;
+
+// Cargar anuncios y registrar eventos de interacción
 document.addEventListener('DOMContentLoaded', () => {
     multiplayerClient.loadInitialAnnouncements();
+
+    const panel = document.getElementById('announcements-panel');
+    if (panel) {
+        // Pausar autocierre si el usuario pasa el mouse o interactúa
+        panel.addEventListener('mouseenter', () => {
+            if (announcementsTimer) {
+                clearTimeout(announcementsTimer);
+                announcementsTimer = null;
+            }
+        });
+        panel.addEventListener('touchstart', () => {
+            if (announcementsTimer) {
+                clearTimeout(announcementsTimer);
+                announcementsTimer = null;
+            }
+        }, { passive: true });
+    }
 });
 
-// Función global para abrir/cerrar panel de anuncios
+// Función global para abrir el panel de anuncios (opcionalmente con autocierre)
+function openAnnouncements(autoCloseSeconds = null) {
+    const panel = document.getElementById('announcements-panel');
+    if (!panel) return;
+    panel.style.display = 'flex';
+    multiplayerClient.loadInitialAnnouncements();
+
+    if (announcementsTimer) {
+        clearTimeout(announcementsTimer);
+        announcementsTimer = null;
+    }
+
+    if (autoCloseSeconds && autoCloseSeconds > 0) {
+        announcementsTimer = setTimeout(() => {
+            closeAnnouncements();
+        }, autoCloseSeconds * 1000);
+    }
+}
+
+// Función global para cerrar panel de anuncios
+function closeAnnouncements() {
+    const panel = document.getElementById('announcements-panel');
+    if (panel) panel.style.display = 'none';
+    if (announcementsTimer) {
+        clearTimeout(announcementsTimer);
+        announcementsTimer = null;
+    }
+}
+
+// Función global para alternar (abrir sin autocierre / cerrar)
 function toggleAnnouncements() {
     const panel = document.getElementById('announcements-panel');
     if (!panel) return;
     if (panel.style.display === 'none' || !panel.style.display) {
-        panel.style.display = 'flex';
-        multiplayerClient.loadInitialAnnouncements();
+        openAnnouncements(null); // Abierto por click manual -> no auto-cerrar
     } else {
-        panel.style.display = 'none';
+        closeAnnouncements();
     }
 }

@@ -11,6 +11,7 @@ class GateScene extends Phaser.Scene {
         const MAP_H = 20;
 
         window.currentActiveLevel = 1;
+        if (window.questManager) questManager.setLevel(1);
         document.getElementById('hud-level').textContent = '📍 Nivel 1 — Puerta del Castillo';
         const pregBtn = document.getElementById('toggle-announcements-btn');
         if (pregBtn) pregBtn.style.display = 'none';
@@ -111,13 +112,12 @@ class GateScene extends Phaser.Scene {
         this.bubble = this.add.image(14.5 * TILE + 8, 4 * TILE - 4, 'bubble');
         this.bubble.setVisible(false);
 
-        // Label del NPC con sombra
+        // Label del NPC nítido
         this.add.text(14.5 * TILE + 8, 4 * TILE - 14, '🛡️ Leo el Guardia', {
-            fontSize: '5px',
-            fontFamily: '"Press Start 2P"',
+            fontSize: '6px',
+            fontFamily: '"Press Start 2P", monospace',
             color: '#ffd700',
-            stroke: '#000000',
-            strokeThickness: 2,
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true },
             align: 'center'
         }).setOrigin(0.5);
 
@@ -150,10 +150,9 @@ class GateScene extends Phaser.Scene {
         // --- Texto de ayuda ---
         this.add.text(14.5 * TILE + 8, (MAP_H - 1) * TILE, 'Flechas = Mover | ENTER = Hablar', {
             fontSize: '6px',
-            fontFamily: '"Press Start 2P"',
-            color: '#ffd700',
-            stroke: '#000000',
-            strokeThickness: 2,
+            fontFamily: '"Press Start 2P", monospace',
+            color: '#e8d5a3',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 0, fill: true },
             align: 'center'
         }).setOrigin(0.5);
 

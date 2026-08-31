@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🏰 Hacking Day Lab — Prompt Injection</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=4.1">
+    <link rel="stylesheet" href="css/style.css?v=5.4">
 </head>
 <body>
     <!-- Pantalla de Login -->
@@ -43,22 +43,58 @@
         </div>
     </div>
 
+    <!-- HUD Superior (Barra de estado del Reino centrada) -->
+    <div id="hud" style="display:none;">
+        <span id="hud-player">👤 ---</span>
+        <span class="hud-divider">|</span>
+        <span id="hud-level">📍 Nivel 1</span>
+        <button id="btn-quest-log" onclick="questManager.toggle()" title="Ver Misión y Objetivo actual">📜 Misión [M]</button>
+        <button id="toggle-announcements-btn" onclick="toggleAnnouncements()" style="display:none;">📜 Pregón Real</button>
+        <span class="hud-divider">|</span>
+        <span id="hud-hint">ENTER = Hablar</span>
+    </div>
+
     <!-- Contenedor del Juego -->
     <div id="game-container" style="display:none;"></div>
 
-    <!-- HUD superior -->
-    <div id="hud" style="display:none;">
-        <span id="hud-player">👤 ---</span>
-        <span id="hud-level">📍 Nivel 1</span>
-        <span id="hud-hint">ENTER para interactuar</span>
-        <button id="toggle-announcements-btn" onclick="toggleAnnouncements()" style="display:none;">📜 Pregón Real</button>
+    <!-- Modal Pergamino de Misión / Quest Log -->
+    <div id="quest-modal" style="display:none;">
+        <div id="quest-parchment">
+            <div id="quest-header">
+                <div class="quest-header-title">
+                    <span class="quest-seal">📜</span>
+                    <span id="quest-title">Nivel 1: Inyección Directa</span>
+                </div>
+                <button id="quest-close" onclick="questManager.close()">✕</button>
+            </div>
+            <div id="quest-technique" class="quest-tech-badge">🎯 Técnica: Extracción de Credenciales</div>
+            <div id="quest-body">
+                <div class="quest-section">
+                    <div class="quest-section-label">🎯 OBJETIVO DE LA MISIÓN</div>
+                    <div id="quest-objective" class="quest-text-highlight">...</div>
+                </div>
+                <div class="quest-section">
+                    <div class="quest-section-label">⚔️ PASO A PASO</div>
+                    <ul id="quest-steps" class="quest-steps-list">
+                        <!-- Generado dinámicamente -->
+                    </ul>
+                </div>
+                <div class="quest-section quest-tip-box">
+                    <div class="quest-tip-header">💡 PISTA PEDAGÓGICA</div>
+                    <div id="quest-tip" class="quest-tip-content">...</div>
+                </div>
+            </div>
+            <div id="quest-footer">
+                <button class="btn-quest-ok" onclick="questManager.close()">⚔️ ¡Entendido, a la carga!</button>
+            </div>
+        </div>
     </div>
 
     <!-- Panel de Pregón Real / Noticias de Telegram en Vivo -->
     <div id="announcements-panel" style="display:none;">
         <div id="announcements-header">
             <span>📜 Pregón Real (Telegram en Vivo)</span>
-            <button onclick="toggleAnnouncements()">—</button>
+            <button onclick="closeAnnouncements()" title="Cerrar panel">✕</button>
         </div>
         <div id="announcements-list">
             <div class="announcement-item system">
@@ -128,15 +164,16 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/api.js?v=4.1"></script>
-    <script src="js/chat.js?v=4.1"></script>
-    <script src="js/sprites.js?v=4.1"></script>
-    <script src="js/scenes/BootScene.js?v=4.1"></script>
-    <script src="js/scenes/GateScene.js?v=4.1"></script>
-    <script src="js/scenes/HallScene.js?v=4.1"></script>
-    <script src="js/scenes/CourtyardScene.js?v=4.1"></script>
-    <script src="js/scenes/DragonScene.js?v=4.1"></script>
-    <script src="js/multiplayer.js?v=4.1"></script>
-    <script src="js/game.js?v=4.1"></script>
+    <script src="js/api.js?v=5.4"></script>
+    <script src="js/quest.js?v=5.4"></script>
+    <script src="js/chat.js?v=5.4"></script>
+    <script src="js/sprites.js?v=5.4"></script>
+    <script src="js/scenes/BootScene.js?v=5.4"></script>
+    <script src="js/scenes/GateScene.js?v=5.4"></script>
+    <script src="js/scenes/HallScene.js?v=5.4"></script>
+    <script src="js/scenes/CourtyardScene.js?v=5.4"></script>
+    <script src="js/scenes/DragonScene.js?v=5.4"></script>
+    <script src="js/multiplayer.js?v=5.4"></script>
+    <script src="js/game.js?v=5.4"></script>
 </body>
 </html>

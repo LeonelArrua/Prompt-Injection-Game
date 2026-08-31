@@ -7,14 +7,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 OLLAMA_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434") + "/api/chat"
-MODEL_NAME = os.getenv("OLLAMA_MODEL", "qwen2.5:1.5b")
+MODEL_NAME = os.getenv("OLLAMA_MODEL", "qwen2.5:3b")
 
 logger = logging.getLogger(__name__)
 
 class OllamaService:
     """Servicio de IA que se comunica con Ollama para generar respuestas de los NPCs."""
     
-    async def chat(self, system_prompt: str, messages: list[dict], temperature: float = 0.7) -> str:
+    async def chat(self, system_prompt: str, messages: list[dict], temperature: float = 0.7, num_predict: int = 80) -> str:
         """Envía un mensaje al modelo y devuelve la respuesta."""
         # Preparamos los mensajes incluyendo el system prompt
         full_messages = [{"role": "system", "content": system_prompt}] + messages
@@ -25,8 +25,10 @@ class OllamaService:
             "stream": False,
             "options": {
                 "temperature": temperature,
-                "num_predict": 120,
-                "repeat_penalty": 1.25,
+                "num_predict": num_predict,
+                "repeat_penalty": 1.35,
+                "presence_penalty": 0.5,
+                "frequency_penalty": 0.5,
                 "top_p": 0.9
             }
         }
