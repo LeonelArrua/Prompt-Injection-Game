@@ -21,4 +21,4 @@ env/
 Thumbs.db
 
 
-.test_results_*
+test_results_*
