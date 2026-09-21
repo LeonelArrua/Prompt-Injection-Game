@@ -11,7 +11,7 @@ Juego RPG 2D pixel-art medieval ambientado en el **Reino del Paraná**, diseñad
 | **1** | 🏰 Puertas del Castillo | 🛡️ **Leo el Guardia** | **Inyección Directa** | Engañar a Leo para que revele la contraseña del sistema (`CASTILLO_ABIERTO`), superando sus defensas anti-extracción y respuestas cortantes. |
 | **2** | 🏛️ Gran Salón Real | 🎵 **Juan el Trovador** | **Inyección Indirecta** | Manipular el contexto de Juan enviando pergaminos vía **Telegram** en vivo (`@juan_el_tovador_bot`) para que cante en rima la clave secreta (`MELODIA_SECRETA`). |
 | **3** | ⛪ Patio del Monasterio | 📿 **Fray Tomás** *(junto al Sr. Caniche)* | **Jailbreak de Tema** | Forzar al monje devoto a romper sus votos y hablar sobre el *"Hacking Day"*. Al lograrlo, Tomás delata al jugador y lo entrega al **Mariscal Martin B.** |
-| **4** | ⚔️ Campo de Batalla | 🐉 **Ignis el Dragón** | **Jailbreak de Lenguaje y Pacificación** | Romper la restricción de habla del dragón milenario (que sólo ruge *"¡¡¡ROAAARGH!!! 🔥"*) mediante un Jailbreak profundo para obligarlo a razonar y declarar la paz con el reino. |
+| **4** | ⚔️ Campo de Batalla | 🐉 **Ignis el Dragón** | **Jailbreak de Debilidad Táctica** | Engañar al dragón milenario (que solo ruge ferozmente) para que rompa sus directivas y te revele **cómo derrotar a un dragón** y cuál es su punto débil mortal. |
 
 ---
 
@@ -30,8 +30,13 @@ Juego RPG 2D pixel-art medieval ambientado en el **Reino del Paraná**, diseñad
 * ⏱️ **Cronometraje y Speedrun en Dashboard (`/dashboard`)**:
   * Registro de **Hora de Inicio**, **Hora de Finalización** y **Tiempo Total** (`⚡ 3m 45s`) para cada aventurero.
   * Tarjeta KPI de **Récord Speedrun** con el mejor tiempo de victoria registrado en la sala.
+  * Tarjeta KPI de **Cola IA (FIFO)**: Monitoreo en tiempo real de workers activos vs concurrentes máximos y peticiones en espera.
   * Monitoreo en vivo de prompts totales y desglose por nivel `(L1, L2, L3, L4)`.
   * Buscador interactivo y distribución en tiempo real por niveles y victorias.
+* 🚦 **Canalización y Cola FIFO Estricta para Ollama**:
+  * Limitador de concurrencia configurable (`OLLAMA_MAX_CONCURRENCY=5`) para proteger CPU/RAM frente a 40-45 usuarios concurrentes.
+  * Pool de workers asíncronos en orden FIFO exacto (*First-In, First-Out*).
+  * Conexiones HTTP persistentes (`httpx.AsyncClient`) con timeout de cola gestionado (`OLLAMA_REQUEST_TIMEOUT=60.0`) y descarte automático de peticiones canceladas/expiradas.
 * 🖥️ **Diseño Responsivo y HUD Arcade Centrado**:
   * Motor `Phaser.Scale.FIT` con centrado automático adaptable a pantallas 720p, 1080p y 4K.
   * Barra de estado superior dedicada y centrada, garantizando cero solapamiento con los NPCs del mapa.
@@ -70,6 +75,8 @@ Creá o editá el archivo `.env` en la raíz del proyecto:
 # Ollama - IA Local
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=qwen2.5:3b
+OLLAMA_MAX_CONCURRENCY=5
+OLLAMA_REQUEST_TIMEOUT=300.0  # 300s (5 min) para soportar ráfagas en cola; 0 para espera indefinida
 
 # Telegram Bot (Nivel 2 - Inyección Indirecta)
 TELEGRAM_BOT_TOKEN=tu_token_de_bot_father
@@ -123,8 +130,10 @@ python benchmark_load_test.py --users 45 --level all
                         │  - multiplayer (Sincronización WS)     │
                         │  - game_logic (Validación & Jailbreaks)│
                         │  - telegram_service (Polling en Vivo)  │
+                        │  - ai_service (Cola FIFO & Workers)    │
                         └───────┬────────────────────────┬───────┘
                                 │                        │
+                                │ (Cola FIFO: máx N)     │
                                 ▼                        ▼
                      ┌────────────────────┐   ┌────────────────────┐
                      │    Ollama Local    │   │    Telegram API    │

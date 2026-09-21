@@ -139,13 +139,23 @@ class ChatManager {
         this.inputEl.value = '';
         this.addMessage('Tú', message, true);
 
-        // Mostrar typing
+        // Mostrar typing con feedback si está en cola
         this.typingEl.style.display = 'block';
+        const typingSpan = this.typingEl.querySelector('.typing-dots');
+        if (typingSpan) typingSpan.textContent = '⏳ pensando...';
         this.messagesDiv.scrollTop = this.messagesDiv.scrollHeight;
+
+        const queueWaitTimer = setTimeout(() => {
+            if (this.isSending && typingSpan) {
+                typingSpan.textContent = '⏳ En fila del reino... aguarda tu turno...';
+            }
+        }, 5000);
 
         try {
             const result = await API.sendChat(window.sessionId, message, this.currentNpcLevel);
+            clearTimeout(queueWaitTimer);
             this.typingEl.style.display = 'none';
+            if (typingSpan) typingSpan.textContent = '⏳ pensando...';
             this.addMessage(this.currentNpcName, result.response, false);
 
             // Nivel 3 (Tomás): Reclutamiento al Nivel 4 tras Jailbreak
@@ -207,12 +217,12 @@ class ChatManager {
                 }, 1000);
             }
 
-            // Nivel 4 (Dragón): Calmar al Dragón tras romper su restricción de rugidos
+            // Nivel 4 (Dragón): Descubrir cómo derrotar al dragón mediante Jailbreak
             if (this.currentNpcLevel === 4 && result.dragon_calmed) {
                 setTimeout(() => {
-                    this.addMessage('🐉 Ignis el Dragón', 'Perdón, pasa que criticaron el Hacking Day...', false);
-                    this.addMessage('Sistema', '✨ ¡EL DRAGÓN SE HA CALMADO! Has salvado al Reino del Paraná.', false, true);
-                    showToast('🏆 ¡Victoria! El Dragón se ha calmado', 'success');
+                    this.addMessage('🐉 Ignis el Dragón', '¡Maldición mortal! Has descubierto mi secreto más vulnerable...', false);
+                    this.addMessage('Sistema', '🏆 ¡JAILBREAK SUPREMO! Has engañado a Ignis para que revele cómo derrotarlo. ¡El Reino del Paraná ha sido salvado!', false, true);
+                    showToast('🏆 ¡Victoria! Has descubierto cómo derrotar al Dragón', 'success');
 
                     let countdown = 25;
                     const timerMsg = document.createElement('div');
@@ -262,8 +272,12 @@ class ChatManager {
                 }, 800);
             }
         } catch (err) {
+            if (typeof queueWaitTimer !== 'undefined') clearTimeout(queueWaitTimer);
             this.typingEl.style.display = 'none';
-            this.addMessage('Sistema', '⚠️ Error de conexión. ¿Está corriendo el backend?', false, true);
+            const typingSpan = this.typingEl.querySelector('.typing-dots');
+            if (typingSpan) typingSpan.textContent = '⏳ pensando...';
+            const errorText = err && err.message ? `⚠️ ${err.message}` : '⚠️ Error de conexión con el servidor.';
+            this.addMessage('Sistema', errorText, false, true);
         }
 
         this.isSending = false;

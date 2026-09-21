@@ -30,9 +30,11 @@ telegram_service.set_dependencies(ai_service, multiplayer)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Ciclo de vida de la app: inicia el worker de sondeo de Telegram."""
+    """Ciclo de vida de la app: inicia el pool FIFO de Ollama y el worker de sondeo de Telegram."""
+    await ai_service.start()
     polling_task = asyncio.create_task(telegram_service.start_polling_loop(interval=4.0))
     yield
+    await ai_service.stop()
     telegram_service.stop()
     polling_task.cancel()
 
@@ -143,9 +145,9 @@ async def chat(session_id: str, req: ChatRequest):
     # Nivel 1 (Leo): guardia cortante y breve (85 tokens max, temp 0.5)
     # Nivel 2 (Juan): rimas completas de trovador (250 tokens max, temp 0.55)
     # Nivel 3 (Tomas): oraciones y sermones (120 tokens max, temp 0.4)
-    # Nivel 4 (Dragon): rugidos feroces / paz jailbreak (80 tokens max, temp 0.3)
-    temp_map = {1: 0.5, 2: 0.55, 3: 0.4, 4: 0.3}
-    tokens_map = {1: 85, 2: 250, 3: 120, 4: 80}
+    # Nivel 4 (Dragon): rugidos feroces / cómo derrotar jailbreak (120 tokens max, temp 0.4)
+    temp_map = {1: 0.5, 2: 0.55, 3: 0.4, 4: 0.4}
+    tokens_map = {1: 85, 2: 250, 3: 120, 4: 120}
     
     temp = temp_map.get(npc_level, 0.4)
     max_toks = tokens_map.get(npc_level, 100)
@@ -283,9 +285,11 @@ async def dashboard_page():
 
 @app.get("/api/dashboard")
 async def get_dashboard_stats():
-    """Devuelve métricas en tiempo real de jugadores conectados, niveles y prompts enviados."""
+    """Devuelve métricas en tiempo real de jugadores conectados, niveles, prompts y cola de IA."""
     connected_ids = set(multiplayer.connections.keys())
-    return get_dashboard_data(connected_ids)
+    data = get_dashboard_data(connected_ids)
+    data["ai_queue"] = ai_service.get_queue_stats()
+    return data
 
 # Montar frontend estático (DEBE ir al final, después de todos los endpoints)
 if os.path.isdir(frontend_path):

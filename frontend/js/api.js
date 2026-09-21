@@ -32,7 +32,11 @@ const API = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message, npc_level: npcLevel })
         });
-        return await res.json();
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.detail || 'Error al comunicarse con el NPC');
+        }
+        return data;
     },
 
     async verifyPassword(sessionId, level, password) {

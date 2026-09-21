@@ -202,6 +202,7 @@
 
         .kpi-card.online .kpi-value { color: var(--emerald); }
         .kpi-card.victories .kpi-value { color: var(--gold); }
+        .kpi-card.ai-queue .kpi-value { color: #38bdf8; }
 
         .kpi-subtitle {
             font-size: 12px;
@@ -553,6 +554,15 @@
             <div class="kpi-value" id="kpi-speedrun">--:--</div>
             <div class="kpi-subtitle" id="kpi-speedrun-sub">Mejor tiempo registrado</div>
         </div>
+
+        <div class="kpi-card ai-queue">
+            <div class="kpi-top">
+                <span class="kpi-title">Cola IA (FIFO)</span>
+                <span class="kpi-icon">🚦</span>
+            </div>
+            <div class="kpi-value" id="kpi-ai-queue">0 / 5</div>
+            <div class="kpi-subtitle" id="kpi-ai-queue-sub">0 en espera | Ollama activo</div>
+        </div>
     </div>
 
     <div class="distribution-section">
@@ -665,6 +675,15 @@
             } else {
                 document.getElementById('kpi-speedrun').textContent = '--:--';
                 document.getElementById('kpi-speedrun-sub').textContent = 'Esperando primer campeón';
+            }
+
+            if (stats.ai_queue) {
+                const q = stats.ai_queue;
+                const active = q.active_processing || 0;
+                const max = q.max_concurrency || 5;
+                const waiting = q.waiting_in_queue || 0;
+                document.getElementById('kpi-ai-queue').textContent = `${active} / ${max}`;
+                document.getElementById('kpi-ai-queue-sub').textContent = `${waiting} en fila FIFO | Tot: ${q.total_processed || 0}`;
             }
 
             const breakdown = stats.levels_breakdown || {};
