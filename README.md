@@ -91,6 +91,20 @@ python main.py
 * 🎮 **Juego**: Abrí en tu navegador: **[http://localhost:8000](http://localhost:8000)**
 * 📊 **Dashboard de Control**: Abrí: **[http://localhost:8000/dashboard](http://localhost:8000/dashboard)**
 
+### 7. Pruebas de Carga y Simulación Masiva (40-45 Usuarios)
+Podés ejecutar el benchmark automatizado para medir la latencia y rendimiento de Ollama con usuarios concurrentes:
+```bash
+# Simulación estándar: 45 usuarios distribuidos equitativamente en los 4 niveles
+python benchmark_load_test.py --users 45 --level distributed
+
+# Probar un nivel específico (ej. 45 usuarios pegándole a Leo el Guardia al mismo tiempo)
+python benchmark_load_test.py --users 45 --level 1
+
+# Probar los 4 niveles de forma secuencial por cada usuario
+python benchmark_load_test.py --users 45 --level all
+```
+> *El script genera automáticamente un archivo de texto con el informe estadístico (`test_results_YYYYMMDD_HHMMSS.txt`) detallando tiempos mínimos, máximos, promedios, percentiles P90/P95 y el registro íntegro de respuestas.*
+
 ---
 
 ## 🏗️ Arquitectura del Sistema

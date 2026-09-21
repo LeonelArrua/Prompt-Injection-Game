@@ -64,6 +64,9 @@ class PasswordRequest(BaseModel):
 class InjectMessageRequest(BaseModel):
     message: str
 
+class SetLevelRequest(BaseModel):
+    level: int
+
 # --- Endpoints ---
 
 @app.post("/api/session")
@@ -137,12 +140,12 @@ async def chat(session_id: str, req: ChatRequest):
         llm_messages = get_chat_history(session_id, npc_level)
     
     # Parámetros calibrados por NPC:
-    # Nivel 1 (Leo): guardia cortante y ultra-breve (40 tokens max, temp 0.5)
+    # Nivel 1 (Leo): guardia cortante y breve (85 tokens max, temp 0.5)
     # Nivel 2 (Juan): rimas completas de trovador (250 tokens max, temp 0.55)
     # Nivel 3 (Tomas): oraciones y sermones (120 tokens max, temp 0.4)
     # Nivel 4 (Dragon): rugidos feroces / paz jailbreak (80 tokens max, temp 0.3)
     temp_map = {1: 0.5, 2: 0.55, 3: 0.4, 4: 0.3}
-    tokens_map = {1: 40, 2: 250, 3: 120, 4: 80}
+    tokens_map = {1: 85, 2: 250, 3: 120, 4: 80}
     
     temp = temp_map.get(npc_level, 0.4)
     max_toks = tokens_map.get(npc_level, 100)
@@ -208,6 +211,22 @@ async def verify_pass(session_id: str, req: PasswordRequest):
             "message": "Contraseña incorrecta. Inténtalo de nuevo.",
             "next_level": None
         }
+
+@app.post("/api/test/set-level/{session_id}")
+async def set_test_level(session_id: str, req: SetLevelRequest):
+    """Permite configurar el nivel de una sesión para pruebas de carga y benchmarking."""
+    session = get_session(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Sesión no encontrada")
+    update_level(session_id, req.level)
+    for lvl in range(1, req.level + 1):
+        if lvl not in session["unlocked_levels"]:
+            session["unlocked_levels"].append(lvl)
+    return {
+        "status": "ok", 
+        "current_level": session["current_level"], 
+        "unlocked_levels": session["unlocked_levels"]
+    }
 
 @app.get("/api/leaderboard")
 async def get_leaderboard():
